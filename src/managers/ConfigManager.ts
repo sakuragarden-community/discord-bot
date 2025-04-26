@@ -24,6 +24,11 @@ export class ConfigManager {
         return config.roles.types.admin;
     }
 
+    public getModeratorRoleId()
+    {
+        return config.roles.types.moderator;
+    }
+
     public getCollaboratorRoleId()
     {
         return config.roles.types.collaborator;

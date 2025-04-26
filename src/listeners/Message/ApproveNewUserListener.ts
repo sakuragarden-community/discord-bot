@@ -30,7 +30,7 @@ export class ApproveNewUserListener extends Listener {
         let guild = await this.configManager.getGuild();
         let memberReact = await guild.members.fetch(user.id);
         let roles = memberReact.roles.valueOf().map(role => role.id);
-        if (!roles.includes(this.configManager.getAdminRoleId())) {
+        if (!(roles.includes(this.configManager.getAdminRoleId()) || roles.includes(this.configManager.getModeratorRoleId()))) {
             return;
         }
 
