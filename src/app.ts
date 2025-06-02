@@ -2,6 +2,8 @@ import 'reflect-metadata';
 import {SapphireClient} from '@sapphire/framework';
 import {GatewayIntentBits, Partials} from 'discord.js';
 import dotenv from 'dotenv';
+import { ApplicationCommandRegistries, RegisterBehavior } from '@sapphire/framework';
+
 
 const client = new SapphireClient({
     intents: [
