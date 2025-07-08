@@ -52,7 +52,7 @@ export class ApproveNewUserListener extends Listener {
 
         // Invia messaggio di approvazione in privato
         try {
-            let approvedMessage = fs.readFileSync("messages/approved.md", "utf-8");
+            let approvedMessage = fs.readFileSync("messages/approved_private.md", "utf-8");
             await memberReacted.send(approvedMessage);
         } catch (error) {
             console.error(error);
@@ -61,13 +61,13 @@ export class ApproveNewUserListener extends Listener {
         // Invia messaggio di approvazione in pubblico
         let messageUrl = messageReaction.message.url;
         try {
-            let newentryMessage = fs.readFileSync("messages/newentry.md", "utf-8");
-            newentryMessage = newentryMessage.replace('{{new_member}}', memberReacted.toString())
+            let approvedMessage = fs.readFileSync("messages/approved_public.md", "utf-8");
+            approvedMessage = approvedMessage.replace('{{new_member}}', memberReacted.toString())
                 .replace('{{presentation_url}}', messageUrl)
                 .replace('{{user_id}}', memberReacted.user.id);
             let channel = await guild.channels.fetch(this.configManager.getMainChannelId());
             if (channel && channel.isTextBased()) {
-                await channel.send(newentryMessage);
+                await channel.send(approvedMessage);
             }
         } catch (error) {
             console.error(error);

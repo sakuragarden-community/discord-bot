@@ -20,10 +20,24 @@ export class AddListener extends Listener {
     }
 
     public override async run(member: GuildMember) {
-        // Invia messaggio di benvenuto
+        let guild = await this.configManager.getGuild();
+
+        // Invia messaggio di benvenuto in privato
         try {
-            let welcomeMessage = fs.readFileSync("messages/welcome.md", "utf-8");
+            let welcomeMessage = fs.readFileSync("messages/welcome_private.md", "utf-8");
             await member.send(welcomeMessage);
+        } catch (error) {
+            console.error(error);
+        }
+
+        // Invia messaggio di benvenuto in pubblico
+        try {
+            let welcomeMessage = fs.readFileSync("messages/welcome_public.md", "utf-8");
+            welcomeMessage = welcomeMessage.replace('{{new_member}}', member.toString());
+            let channel = await guild.channels.fetch(this.configManager.getMainChannelId());
+            if (channel && channel.isTextBased()) {
+                await channel.send(welcomeMessage);
+            }
         } catch (error) {
             console.error(error);
         }
