@@ -30,7 +30,6 @@ export class AutoBumpListener extends Listener {
                 await channel.send('/bump');
             }
         });
-
-         */
+        */
     }
 }
