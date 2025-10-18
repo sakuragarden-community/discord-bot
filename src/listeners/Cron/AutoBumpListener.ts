@@ -1,6 +1,5 @@
 import "reflect-metadata"
 import { autoInjectable } from "tsyringe";
-import cron from 'node-cron';
 import { Listener } from '@sapphire/framework';
 import {Client, Message} from "discord.js";
 import { ConfigManager } from "../../managers/ConfigManager";
