@@ -74,12 +74,14 @@ export class ApproveNewUserListener extends Listener {
         }
 
         // Salva il nuovo membro nel database
+        /* TODO:: Mettere up le API
         const response = await axios.post('http://sakuragarden.it/api/users', {
             'discord_id': memberReacted.id,
             'name': memberReacted.displayName,
             'introduction_url': messageUrl,
         });
         console.log(response);
+         */
     }
 
 }
