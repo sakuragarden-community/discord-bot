@@ -14,6 +14,7 @@ const client = new SapphireClient({
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildMessageReactions,
         GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildScheduledEvents,
     ],
     partials: [
         Partials.Channel,
