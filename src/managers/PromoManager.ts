@@ -1,5 +1,7 @@
 import "reflect-metadata";
 import { Client, TextChannel, ChannelType, ThreadAutoArchiveDuration, EmbedBuilder, ThreadChannel, Message, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel, Guild } from "discord.js";
+import { promises as fs } from "fs";
+import path from "path";
 
 export interface ParticipationDate {
     hosts: string[];
@@ -47,17 +49,23 @@ export class PromoManager {
         ]
     };
 
-    // In-memory events store replacing file-based storage (events.json)
-    private events: Record<string, { partecipants: string[]; thread_id?: string }> = {};
+    private eventsFilePath = path.join(process.cwd(), "storage", "events.json");
 
-    // In-memory helpers (no-op wrappers kept async for API compatibility)
     private async readEventsStore(): Promise<Record<string, { partecipants: string[]; thread_id?: string }>> {
-        return this.events;
+        try {
+            const raw = await fs.readFile(this.eventsFilePath, "utf8");
+            const data = JSON.parse(raw);
+            if (Array.isArray(data)) return {};
+            if (data && typeof data === "object") return data as Record<string, { partecipants: string[]; thread_id?: string }>;
+            return {};
+        } catch (e: any) {
+            return {};
+        }
     }
 
-    private async writeEventsStore(_store: Record<string, { partecipants: string[]; thread_id?: string }>): Promise<void> {
-        // No file I/O: state is kept in-memory only
-        this.events = _store;
+    private async writeEventsStore(store: Record<string, { partecipants: string[]; thread_id?: string }>): Promise<void> {
+        const json = JSON.stringify(store, null, 2);
+        await fs.writeFile(this.eventsFilePath, json, "utf8");
     }
 
     public async saveEventRecord(eventId: string, threadId?: string): Promise<void> {
@@ -83,7 +91,7 @@ export class PromoManager {
     }
 
     /**
-     * Deletes the thread associated with a given scheduled event, if present in the in-memory events map.
+     * Deletes the thread associated with a given scheduled event, if present in events.json.
      * Returns true if a deletion was attempted (thread_id existed), false otherwise.
      */
     public async deleteEventThread(guild: Guild, eventId: string): Promise<boolean> {
@@ -104,7 +112,7 @@ export class PromoManager {
     }
 
     /**
-     * Se esiste un record per l'evento nell'archivio in-memory e contiene un thread_id,
+     * Se esiste un record per l'evento in events.json e contiene un thread_id,
      * invia un messaggio nel thread menzionando l'utente specificato.
      * Restituisce true se il messaggio è stato inviato, altrimenti false.
      */
@@ -197,11 +205,11 @@ export class PromoManager {
             image: imageBuffer
         });
 
-        // Registra l'evento nell'archivio in-memory con array "partecipants" vuoto
+        // Persisti su storage/events.json l'evento con array "partecipants" vuoto
         try {
             await this.saveEventRecord(createdEvent.id);
         } catch (err) {
-            console.error("Impossibile salvare il record dell'evento nell'archivio in-memory:", err);
+            console.error("Impossibile salvare l'evento su storage/events.json:", err);
         }
 
         // 2) Crea un thread privato nel canale (visibile inizialmente solo al bot)
