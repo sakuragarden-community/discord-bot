@@ -28,8 +28,10 @@ const client = new SapphireClient({
 
 dotenv.config();
 
+client.login(process.env.TOKEN);
+
 if (process.env.MODE === 'staging') {
     client.login(process.env.TOKEN_STAGING);
 } else {
-    client.login(process.env.TOKEN);
+
 }
