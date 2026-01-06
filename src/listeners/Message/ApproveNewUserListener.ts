@@ -1,7 +1,7 @@
 import "reflect-metadata"
 import { autoInjectable } from "tsyringe";
 import { Listener } from '@sapphire/framework';
-import { DMChannel, Guild, GuildMember, Message, MessageReaction, User} from "discord.js";
+import { DMChannel, Guild, GuildMember, Message, MessageReaction, User, EmbedBuilder } from "discord.js";
 import { ConfigManager } from "../../managers/ConfigManager";
 import * as fs from "fs";
 import axios from 'axios';
@@ -58,7 +58,7 @@ export class ApproveNewUserListener extends Listener {
             console.error(error);
         }
 
-        // Invia messaggio di approvazione in pubblico
+        // Invia messaggio di approvazione in pubblico (come embed)
         let messageUrl = messageReaction.message.url;
         try {
             let approvedMessage = fs.readFileSync("messages/approved_public.md", "utf-8");
@@ -67,7 +67,10 @@ export class ApproveNewUserListener extends Listener {
                 .replace('{{user_id}}', memberReacted.user.id);
             let channel = await guild.channels.fetch(this.configManager.getMainChannelId());
             if (channel && channel.isTextBased()) {
-                await channel.send(approvedMessage);
+                const embed = new EmbedBuilder()
+                    .setColor(this.configManager.getPrimaryColor())
+                    .setDescription(approvedMessage);
+                await channel.send({ embeds: [embed] });
             }
         } catch (error) {
             console.error(error);

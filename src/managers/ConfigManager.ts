@@ -1,6 +1,6 @@
 import "reflect-metadata"
 import config from "../../config.json"
-import { Guild } from "discord.js";
+import { Guild, ColorResolvable } from "discord.js";
 import { container } from '@sapphire/framework';
 
 export class ConfigManager {
@@ -62,5 +62,32 @@ export class ConfigManager {
     public getMainChannelId()
     {
         return config.channels.main;
+    }
+
+    public getPromoChannelId()
+    {
+        return config.channels.promo;
+    }
+
+    public getServerChannelId()
+    {
+        return config.channels.server;
+    }
+
+    public getCommandsChannelId()
+    {
+        return (config as any)?.channels?.commands;
+    }
+
+    public getDisboardBotId()
+    {
+        return (config as any)?.bots?.disboard;
+    }
+
+    // Ritorna il colore primario definito nella config
+    public getPrimaryColor(): ColorResolvable
+    {
+        const primary = (config as any)?.colors?.primary ?? "#000000";
+        return primary as ColorResolvable;
     }
 }

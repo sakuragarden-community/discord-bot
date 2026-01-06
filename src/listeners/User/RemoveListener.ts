@@ -1,9 +1,16 @@
 import "reflect-metadata";
+import { autoInjectable } from "tsyringe";
 import { Listener } from '@sapphire/framework';
 import { GuildMember } from 'discord.js';
+import { ConfigManager } from "../../managers/ConfigManager";
 
+@autoInjectable()
 export class RemoveListener extends Listener {
-  public constructor(context: Listener.LoaderContext, options: Listener.Options) {
+  public constructor(
+    context: Listener.LoaderContext,
+    options: Listener.Options,
+    protected configManager: ConfigManager,
+  ) {
     super(context, {
       ...options,
       event: 'guildMemberRemove'
@@ -12,7 +19,7 @@ export class RemoveListener extends Listener {
 
   public override async run(member: GuildMember) {
     try {
-      const channelId = '1304861264790556773';
+      const channelId = this.configManager.getServerChannelId();
       const channel = await member.guild.channels.fetch(channelId);
 
       if (channel && channel.isTextBased()) {

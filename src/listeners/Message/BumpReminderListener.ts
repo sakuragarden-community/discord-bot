@@ -1,17 +1,19 @@
 import "reflect-metadata";
 import { Listener } from '@sapphire/framework';
-import { Message, TextBasedChannel } from 'discord.js';
-
-// Canale target dove osservare il comando /bump
-const TARGET_CHANNEL_ID = '1444757275268092185';
-// ID del bot DISBOARD (in caso si voglia rilevare il messaggio di conferma del bump)
-const DISBOARD_BOT_ID = '302050872383242240';
+import { Message, EmbedBuilder } from 'discord.js';
+import { autoInjectable } from 'tsyringe';
+import { ConfigManager } from '../../managers/ConfigManager';
 
 // Mantiene un timer per canale per evitare duplicati
 const bumpTimers = new Map<string, NodeJS.Timeout>();
 
+@autoInjectable()
 export class BumpReminderListener extends Listener {
-    public constructor(context: Listener.LoaderContext, options: Listener.Options) {
+    public constructor(
+        context: Listener.LoaderContext,
+        options: Listener.Options,
+        protected configManager?: ConfigManager,
+    ) {
         super(context, {
             ...options,
             event: 'messageCreate'
@@ -22,13 +24,18 @@ export class BumpReminderListener extends Listener {
         try {
             // Ignora i DM e messaggi senza canale
             if (!message.guild || !message.channelId) return;
+
+            const targetChannelId = this.configManager?.getCommandsChannelId();
+            if (!targetChannelId) return;
+
             // Solo nel canale target
-            if (message.channelId !== TARGET_CHANNEL_ID) return;
+            if (message.channelId !== targetChannelId) return;
 
             const content = (message.content ?? '').trim().toLowerCase();
 
+            const disboardBotId = this.configManager?.getDisboardBotId();
             const triggeredBySlashText = content.includes('/bump');
-            const triggeredByDisboard = message.author?.id === DISBOARD_BOT_ID;
+            const triggeredByDisboard = !!disboardBotId && message.author?.id === disboardBotId;
 
             // Opzionale: rilevazione semplice di conferma bump da DISBOARD nel contenuto/embeds
             const embedsText = message.embeds?.map(e => `${e.title ?? ''} ${e.description ?? ''}`.toLowerCase()).join(' ') ?? '';
@@ -47,15 +54,20 @@ export class BumpReminderListener extends Listener {
             // Pianifica il reminder dopo 2 ore (2 * 60 * 60 * 1000 ms)
             const timeout = setTimeout(async () => {
                 try {
-                    const ch = await message.client.channels.fetch(TARGET_CHANNEL_ID);
+                    const ch = await message.client.channels.fetch(targetChannelId);
                     if (ch && (ch as any).isTextBased && (ch as any).isTextBased() && 'send' in (ch as any)) {
-                        await (ch as any).send('⏰ Sono passate 2 ore! Ricorda di avviare di nuovo il comando per bumpare.');
+                        const embed = new EmbedBuilder()
+                            .setTitle('⏰ Promemoria Bump')
+                            .setDescription('Sono passate 2 ore! Ricorda di avviare di nuovo il comando per bumpare.')
+                            .setColor(this.configManager?.getPrimaryColor() ?? 0xF39595);
+
+                        await (ch as any).send({ embeds: [embed] });
                     }
                 } catch (err) {
                     // Log silenzioso
                     console.error('Errore nell\'invio del reminder:', err);
                 } finally {
-                    bumpTimers.delete(TARGET_CHANNEL_ID);
+                    bumpTimers.delete(targetChannelId);
                 }
             }, 2 * 60 * 60 * 1000);
 

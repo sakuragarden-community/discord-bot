@@ -1,7 +1,7 @@
 import "reflect-metadata"
 import { autoInjectable } from "tsyringe";
 import { Listener } from '@sapphire/framework';
-import {DMChannel, GuildMember, Message, User} from "discord.js";
+import {DMChannel, GuildMember, Message, User, EmbedBuilder} from "discord.js";
 import * as fs from "fs";
 import {ConfigManager} from "../../managers/ConfigManager";
 
@@ -30,13 +30,16 @@ export class AddListener extends Listener {
             console.error(error);
         }
 
-        // Invia messaggio di benvenuto in pubblico
+        // Invia messaggio di benvenuto in pubblico (come embed)
         try {
             let welcomeMessage = fs.readFileSync("messages/welcome_public.md", "utf-8");
             welcomeMessage = welcomeMessage.replace('{{new_member}}', member.toString());
             let channel = await guild.channels.fetch(this.configManager.getMainChannelId());
             if (channel && channel.isTextBased()) {
-                await channel.send(welcomeMessage);
+                const embed = new EmbedBuilder()
+                    .setColor(this.configManager.getPrimaryColor())
+                    .setDescription(welcomeMessage);
+                await channel.send({ embeds: [embed] });
             }
         } catch (error) {
             console.error(error);
