@@ -58,7 +58,7 @@ export class BumpReminderListener extends Listener {
                     if (ch && (ch as any).isTextBased && (ch as any).isTextBased() && 'send' in (ch as any)) {
                         const embed = new EmbedBuilder()
                             .setTitle('⏰ Promemoria Bump')
-                            .setDescription('Sono passate 2 ore! Ricorda di avviare di nuovo il comando per bumpare.')
+                            .setDescription('Sono passate 2 ore! Ricordtea di avviare di nuovo il comando per bumpare.')
                             .setColor(this.configManager?.getPrimaryColor() ?? 0xF39595);
 
                         await (ch as any).send({ embeds: [embed] });
