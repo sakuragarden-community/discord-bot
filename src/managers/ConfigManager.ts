@@ -84,6 +84,27 @@ export class ConfigManager {
         return (config as any)?.bots?.disboard;
     }
 
+    public getVoicesCategoryId()
+    {
+        return (config as any)?.categories?.voices;
+    }
+
+    public getVocalTriggerChannelId()
+    {
+        return (config as any)?.triggers?.vocal;
+    }
+
+    public getVoiceMaxUsers(): number
+    {
+        const raw = (config as any)?.voice?.maxUsers;
+        let max = Number.isInteger(raw) ? raw as number : parseInt(String(raw ?? 10), 10);
+        if (!Number.isFinite(max) || isNaN(max)) max = 10;
+        // Discord user limit: 0 means unlimited; typical range 1..99. Clamp to 0..99 just in case.
+        if (max < 0) max = 0;
+        if (max > 99) max = 99;
+        return max;
+    }
+
     // Ritorna il colore primario definito nella config
     public getPrimaryColor(): ColorResolvable
     {
