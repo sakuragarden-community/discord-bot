@@ -74,6 +74,11 @@ export class ConfigManager {
         return (config as any)?.channels?.commands;
     }
 
+    public getPresentationsChannelId()
+    {
+        return (config as any)?.channels?.presentations;
+    }
+
     public getDisboardBotId()
     {
         return (config as any)?.bots?.disboard;
