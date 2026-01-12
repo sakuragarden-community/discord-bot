@@ -1,0 +1,74 @@
+{
+  "menu": {
+    "channelId": "1367389015589781540",
+    "messages": [
+      {
+        "id": "1460405103956852921",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://cdn.discordapp.com/attachments/1367389015589781540/1460339738270761030/Menu_Principale_2.png?ex=69668edd&is=69653d5d&hm=fecce8f851a647534d57afca9a31db8642df74fb2272baf3af9ed2fc8b852ddd",
+        "buttons": []
+      },
+      {
+        "id": "1460405105831575674",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "> **\uFEFF:herb:\uFEFF BENVENUTO NEL NOSTRO RIFUGIO, VIAGGIATORE** :cherry_blossom:\uFEFF \n> \uFEFF\n> La nostra community ti accoglie a braccia aperte! :people_hugging:\uFEFF \n> Comincia ad esplorare il server **navigando nei canali**\n> o **selezionando uno dei comandi qui in basso.**",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "1460405107328942123",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://cdn.discordapp.com/attachments/1367389015589781540/1460400590126452807/Primi_Passi_1.png?ex=6966c789&is=69657609&hm=c31e5e02bac52c483f3370dc162a56ec8353a99c96a31e400cd2d2dcfddf81dc",
+        "buttons": []
+      },
+      {
+        "id": "1460405108612530258",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "",
+        "buttons": [
+          {
+            "type": "link",
+            "label": "\uD83D\uDDE3 Presentati alla community",
+            "url": "https://discord.com/channels/1367389015111897120/1406180933907910656"
+          },
+          {
+            "type": "link",
+            "label": "ℹ\uFE0F Seguici su Instagram",
+            "url": "https://www.instagram.com/sakura.garden/"
+          },
+          {
+            "type": "link",
+            "label": "\uD83D\uDC8E Fai una donazione o boosta il server",
+            "url": "https://www.instagram.com/sakura.garden/"
+          },
+          {
+            "type": "link",
+            "label": "\uD83D\uDCD9 Guida al nostro Discord",
+            "url": "https://www.instagram.com/sakura.garden/"
+          },
+          {
+            "type": "link",
+            "label": "\uD83E\uDE7A Apri un ticket di supporto",
+            "url": "https://www.instagram.com/sakura.garden/"
+          },
+          {
+            "type": "link",
+            "label": "\uD83D\uDE0E Server Amici",
+            "url": "https://www.instagram.com/sakura.garden/"
+          }
+        ]
+      }
+    ]
+  }
+}
