@@ -3,34 +3,34 @@
     "channelId": "1367389015589781540",
     "messages": [
       {
-        "id": "1460405103956852921",
+        "id": "new",
         "type": "default",
         "embedColor": "",
         "embedTitle": "",
         "content": "",
-        "image": "https://cdn.discordapp.com/attachments/1367389015589781540/1460339738270761030/Menu_Principale_2.png?ex=69668edd&is=69653d5d&hm=fecce8f851a647534d57afca9a31db8642df74fb2272baf3af9ed2fc8b852ddd",
+        "image": "https://media.discordapp.net/attachments/1367389016957128791/1462402288982294725/menu-principale.png?ex=696e0fc3&is=696cbe43&hm=e919e2a8a769d3a3f340ff6dd347505e6c48a314309a0070204b2cff2101e65a&=&format=webp&quality=lossless",
         "buttons": []
       },
       {
-        "id": "1460405105831575674",
+        "id": "new",
         "type": "default",
         "embedColor": "",
         "embedTitle": "",
-        "content": "> **\uFEFF:herb:\uFEFF BENVENUT* NEL NOSTRO RIFUGIO** :cherry_blossom:\uFEFF \n> \uFEFF\n> La community ti accoglie a braccia aperte! :people_hugging:\uFEFF \n> Comincia ad esplorare il server **navigando nei canali**\n> o **selezionando uno dei comandi qui in basso.**",
+        "content": "menu/welcome.md",
         "image": "",
         "buttons": []
       },
       {
-        "id": "1460405107328942123",
+        "id": "new",
         "type": "default",
         "embedColor": "",
         "embedTitle": "",
         "content": "",
-        "image": "https://cdn.discordapp.com/attachments/1367389015589781540/1460400590126452807/Primi_Passi_1.png?ex=6966c789&is=69657609&hm=c31e5e02bac52c483f3370dc162a56ec8353a99c96a31e400cd2d2dcfddf81dc",
+        "image": "https://media.discordapp.net/attachments/1367389016957128791/1462402289342873763/bannerino-menu-principale.png?ex=696e0fc3&is=696cbe43&hm=fc09b144c8d8ae81c6e438a98830ba8ae5187ff0e9b69cedac2c243cc105233f&=&format=webp&quality=lossless",
         "buttons": []
       },
       {
-        "id": "1460405108612530258",
+        "id": "new",
         "type": "default",
         "embedColor": "",
         "embedTitle": "",
@@ -49,23 +49,48 @@
           },
           {
             "type": "link",
-            "label": "\uD83D\uDC8E Fai una donazione o boosta il server",
-            "url": "https://www.instagram.com/sakura.garden/"
-          },
+            "label": "\uD83D\uDD18 Leggi il regolamento",
+            "url": "https://discord.com/channels/1367389015111897120/1367389015589781541"
+          }
+        ]
+      },
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "",
+        "buttons": [
           {
             "type": "link",
-            "label": "\uD83D\uDCD9 Guida al nostro Discord",
-            "url": "https://www.instagram.com/sakura.garden/"
+            "label": "\uD83D\uDC8E Fai una donazione o boosta il server",
+            "url": "https://discord.com/channels/1367389015111897120/1462403653200511115"
           },
           {
             "type": "link",
             "label": "\uD83E\uDE7A Apri un ticket di supporto",
-            "url": "https://www.instagram.com/sakura.garden/"
+            "url": "https://discord.com/channels/1367389015111897120/1462403746704261302"
           },
           {
             "type": "link",
             "label": "\uD83D\uDE0E Server Amici",
-            "url": "https://www.instagram.com/sakura.garden/"
+            "url": "https://discord.com/channels/1367389015111897120/1462403135149572211"
+          }
+        ]
+      },
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "",
+        "buttons": [
+          {
+            "type": "link",
+            "label": "©\uFE0F Credits",
+            "url": "https://discord.com/channels/1367389015111897120/1462404237391564934"
           }
         ]
       }

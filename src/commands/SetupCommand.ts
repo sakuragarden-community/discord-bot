@@ -30,6 +30,32 @@ interface SetupSection {
 // Top-level JSON is a record of sections
 type SetupPayload = Record<string, SetupSection>;
 
+function resolveSetupContent(content?: string): string {
+  const value = (content ?? '').trim();
+  if (!value) return '';
+
+  try {
+    // Try multiple base locations where the markdown may live
+    const candidates = [
+      path.join(process.cwd(), 'setup', 'content', value),
+      path.join(process.cwd(), 'setup', value),
+      path.isAbsolute(value) ? value : path.join(process.cwd(), value),
+    ];
+
+    for (const p of candidates) {
+      try {
+        const stat = fs.existsSync(p) ? fs.statSync(p) : null;
+        if (stat && stat.isFile()) {
+          return fs.readFileSync(p, 'utf-8');
+        }
+      } catch {}
+    }
+  } catch {}
+
+  // Fallback: treat it as plain text
+  return value;
+}
+
 function buildComponents(buttons?: SetupButton[]) {
   if (!buttons || buttons.length === 0) return undefined;
   const rows: ActionRowBuilder<ButtonBuilder>[] = [];
@@ -170,7 +196,10 @@ export class SetupCommand extends Command {
               if (isEmbed) {
                 const embed = new EmbedBuilder();
                 if (m.embedTitle) embed.setTitle(m.embedTitle);
-                if (m.content) embed.setDescription(m.content);
+                {
+                  const content = resolveSetupContent(m.content);
+                  if (content) embed.setDescription(content);
+                }
                 if (m.embedColor) {
                   const clr = colorMap[m.embedColor];
                   if (clr) {
@@ -181,7 +210,7 @@ export class SetupCommand extends Command {
 
                 await existing.edit(components ? { embeds: [embed], components } : { embeds: [embed] });
               } else {
-                const content = (m.content ?? '').trim();
+                const content = resolveSetupContent(m.content);
                 if (hasImage) {
                   await existing.edit(components ? { content, files: [m.image!], components } : { content, files: [m.image!] });
                 } else {
@@ -199,7 +228,10 @@ export class SetupCommand extends Command {
               if (isEmbed) {
                 const embed = new EmbedBuilder();
                 if (m.embedTitle) embed.setTitle(m.embedTitle);
-                if (m.content) embed.setDescription(m.content);
+                {
+                  const content = resolveSetupContent(m.content);
+                  if (content) embed.setDescription(content);
+                }
                 if (m.embedColor) {
                   const clr = colorMap[m.embedColor];
                   if (clr) {
@@ -210,7 +242,7 @@ export class SetupCommand extends Command {
 
                 await textChannel.send(components ? { embeds: [embed], components } : { embeds: [embed] });
               } else {
-                const content = (m.content ?? '').trim();
+                const content = resolveSetupContent(m.content);
                 if (hasImage) {
                   await textChannel.send(components ? { content, files: [m.image!], components } : { content, files: [m.image!] });
                 } else {
