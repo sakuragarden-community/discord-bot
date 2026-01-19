@@ -64,6 +64,11 @@
         "buttons": [
           {
             "type": "link",
+            "label": "Comincia a chattare",
+            "url": "https://discord.com/channels/1367389015111897120/1406182241767260200"
+          },
+          {
+            "type": "link",
             "label": "\uD83D\uDC8E Fai una donazione o boosta il server",
             "url": "https://discord.com/channels/1367389015111897120/1462403653200511115"
           },
@@ -74,7 +79,7 @@
           },
           {
             "type": "link",
-            "label": "\uD83D\uDE0E Server Amici",
+            "label": "\uD83D\uDE0E Community Affiliate",
             "url": "https://discord.com/channels/1367389015111897120/1462403135149572211"
           }
         ]
@@ -89,8 +94,61 @@
         "buttons": [
           {
             "type": "link",
+            "label": "I nostri eventi",
+            "url": "https://discord.com/channels/1367389015111897120/1446166686670782554"
+          },
+          {
+            "type": "link",
+            "label": "\uD83D\uDD0B Server di Core Keeper",
+            "url": "https://discord.com/channels/1367389015111897120/1462512677028102225"
+          },
+          {
+            "type": "link",
             "label": "©\uFE0F Credits",
             "url": "https://discord.com/channels/1367389015111897120/1462404237391564934"
+          }
+        ]
+      }
+    ]
+  },
+  "rules": {
+    "channelId": "1367389015589781541",
+    "messages": [
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://media.discordapp.net/attachments/1367389016957128791/1462620730557464730/Regolamento.png?ex=696edb34&is=696d89b4&hm=49078c9b611332150e61b57c70a53ae9c37e7d5be534142b741aa46883aeb95f&=&format=webp&quality=lossless",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "green",
+        "embedTitle": "",
+        "content": "rules/intro.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "Il regolamento di Sakura Garden è suddiviso in due parti:",
+        "content": "",
+        "image": "",
+        "buttons": [
+          {
+            "type": "link",
+            "label": "\uD83D\uDFE5 Leggi le Regole Fondamentali di Condotta",
+            "url": "https://discord.com/channels/1367389015111897120/1462622806662447286"
+          },
+          {
+            "type": "link",
+            "label": "\uD83D\uDFE8 Leggi il Regolamento Interno della Community",
+            "url": "https://discord.com/channels/1367389015111897120/1462622967388180592"
           }
         ]
       }

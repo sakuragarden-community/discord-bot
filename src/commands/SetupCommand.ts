@@ -108,6 +108,12 @@ export class SetupCommand extends Command {
             .setDescription("Entità da configurare")
             .setRequired(true)
             .addChoices({ name: 'messages', value: 'messages' }),
+        )
+        .addStringOption((option) =>
+          option
+            .setName('subcategory')
+            .setDescription('Se entity=messages, limita la pubblicazione alla sottocategoria specificata (es. "menu" o "rules")')
+            .setRequired(false),
         ),
       {},
     );
@@ -115,6 +121,7 @@ export class SetupCommand extends Command {
 
   public override async chatInputRun(interaction: ChatInputCommandInteraction) {
     const entity = interaction.options.getString('entity', true);
+    const subcategory = interaction.options.getString('subcategory');
 
     if (entity !== 'messages') {
       await interaction.reply({ content: 'Entità non supportata.', ephemeral: true });
@@ -153,7 +160,34 @@ export class SetupCommand extends Command {
 
     const colorMap: Record<string, any> = (config as any)?.colors ?? {};
 
-    for (const key of Object.keys(payload)) {
+    // If a subcategory is specified, restrict to that section only
+    let keys = Object.keys(payload);
+    if (subcategory) {
+      if (!Object.prototype.hasOwnProperty.call(payload, subcategory)) {
+        await interaction.editReply(`Sottocategoria "${subcategory}" non trovata. Nessuna azione eseguita.`);
+        return;
+      }
+      // Validate channel existence before proceeding as per requirement
+      const sec = payload[subcategory];
+      const chanIdCheck = (sec as any)?.channelId ?? (sec as any)?.channel_id;
+      if (!chanIdCheck) {
+        await interaction.editReply(`Canale non trovato per la sottocategoria "${subcategory}". Nessuna azione eseguita.`);
+        return;
+      }
+      try {
+        const ch = await interaction.client.channels.fetch(chanIdCheck);
+        if (!ch || !ch.isTextBased()) {
+          await interaction.editReply(`Canale non valido per la sottocategoria "${subcategory}". Nessuna azione eseguita.`);
+          return;
+        }
+      } catch {
+        await interaction.editReply(`Canale non trovato per la sottocategoria "${subcategory}". Nessuna azione eseguita.`);
+        return;
+      }
+      keys = [subcategory];
+    }
+
+    for (const key of keys) {
       const section = payload[key];
       const chanId = (section as any)?.channelId ?? (section as any)?.channel_id;
       if (!section || !chanId || !Array.isArray(section.messages)) continue;
