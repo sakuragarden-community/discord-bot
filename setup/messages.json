@@ -8,7 +8,7 @@
         "embedColor": "",
         "embedTitle": "",
         "content": "",
-        "image": "https://media.discordapp.net/attachments/1367389016957128791/1462402288982294725/menu-principale.png?ex=696e0fc3&is=696cbe43&hm=e919e2a8a769d3a3f340ff6dd347505e6c48a314309a0070204b2cff2101e65a&=&format=webp&quality=lossless",
+        "image": "https://media.discordapp.net/attachments/1367389016957128791/1462402288982294725/menu-principale.png?ex=69755003&is=6973fe83&hm=92b91dda2a9ee491a5f8245612ef44375d96d4b1950debaa4aa82728e7e5c0ab&=&format=webp&quality=lossless",
         "buttons": []
       },
       {
@@ -26,7 +26,7 @@
         "embedColor": "",
         "embedTitle": "",
         "content": "",
-        "image": "https://media.discordapp.net/attachments/1367389016957128791/1462402289342873763/bannerino-menu-principale.png?ex=696e0fc3&is=696cbe43&hm=fc09b144c8d8ae81c6e438a98830ba8ae5187ff0e9b69cedac2c243cc105233f&=&format=webp&quality=lossless",
+        "image": "https://media.discordapp.net/attachments/1367389016957128791/1462402289342873763/bannerino-menu-principale.png?ex=69755003&is=6973fe83&hm=d7a1646f590f783fcd32c70707a7fed868459c68c27d7e8c1852b55f37c2674d&=&format=webp&quality=lossless",
         "buttons": []
       },
       {
@@ -64,7 +64,7 @@
         "buttons": [
           {
             "type": "link",
-            "label": "Comincia a chattare",
+            "label": "\uD83D\uDCAC Comincia a chattare",
             "url": "https://discord.com/channels/1367389015111897120/1406182241767260200"
           },
           {
@@ -94,7 +94,7 @@
         "buttons": [
           {
             "type": "link",
-            "label": "I nostri eventi",
+            "label": "\uD83C\uDF89 I nostri eventi",
             "url": "https://discord.com/channels/1367389015111897120/1446166686670782554"
           },
           {
@@ -120,14 +120,14 @@
         "embedColor": "",
         "embedTitle": "",
         "content": "",
-        "image": "https://media.discordapp.net/attachments/1367389016957128791/1462620730557464730/Regolamento.png?ex=696edb34&is=696d89b4&hm=49078c9b611332150e61b57c70a53ae9c37e7d5be534142b741aa46883aeb95f&=&format=webp&quality=lossless",
+        "image": "https://media.discordapp.net/attachments/1367389016957128791/1462620730557464730/Regolamento.png?ex=697572b4&is=69742134&hm=c7e714da4e1aba70a4c27c463c7444bc7bc7f9c01db2fbdfba12ac9c7517aaa8&=&format=webp&quality=lossless",
         "buttons": []
       },
       {
         "id": "new",
         "type": "embed",
         "embedColor": "green",
-        "embedTitle": "",
+        "embedTitle": "Il regolamento di Sakura Garden è suddiviso in due parti:",
         "content": "rules/intro.md",
         "image": "",
         "buttons": []
@@ -136,7 +136,7 @@
         "id": "new",
         "type": "default",
         "embedColor": "",
-        "embedTitle": "Il regolamento di Sakura Garden è suddiviso in due parti:",
+        "embedTitle": "",
         "content": "",
         "image": "",
         "buttons": [
@@ -153,5 +153,141 @@
         ]
       }
     ]
-  }
+  },
+  "rulesMaster": {
+    "channelId": "1462622806662447286",
+    "messages": [
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "1. Sakura Garden è una comunità pacifica, che professa libertà e uguaglianza.",
+        "content": "rules/master/1.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "2. È anche una comunità civile, che esige rispetto e buon senso.",
+        "content": "rules/master/2.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "3. Si a gatti e memini, no ai discorsi da bar.",
+        "content": "rules/master/3.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "4. Non è permesso lo spam non autorizzato.",
+        "content": "rules/master/4.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "5. Evitate le molestie in privato, tanto vi beccheremo.",
+        "content": "rules/master/5.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "6. Qui non c'è spazio per i troll.",
+        "content": "rules/master/6.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "7. Sforziamoci a fare arte senza l'intelligenza artificiale.",
+        "content": "rules/master/7.md",
+        "image": "",
+        "buttons": []
+      }
+    ]
+  },
+  "rulesBehavior": {
+    "channelId": "1462622967388180592",
+    "messages": [
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "1. Sakura Garden è una comunità pacifica, che professa libertà e uguaglianza.",
+        "content": "rules/behavior/1.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "2. È anche una comunità civile, che esige rispetto e buon senso.",
+        "content": "rules/master/2.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "3. Si a gatti e memini, no ai discorsi da bar.",
+        "content": "rules/master/3.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "4. Non è permesso lo spam non autorizzato.",
+        "content": "rules/master/4.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "5. Evitate le molestie in privato, tanto vi beccheremo.",
+        "content": "rules/master/5.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "6. Qui non c'è spazio per i troll.",
+        "content": "rules/master/6.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "7. Sforziamoci a fare arte senza l'intelligenza artificiale.",
+        "content": "rules/master/7.md",
+        "image": "",
+        "buttons": []
+      }
+    ]
+  },
 }

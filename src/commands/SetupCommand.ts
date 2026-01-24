@@ -209,7 +209,8 @@ export class SetupCommand extends Command {
               continue;
             }
 
-            const isEmbed = m.type === 'embed';
+            const msgType = (m.type as string | undefined)?.toString().trim().toLowerCase() ?? 'default';
+            const isEmbed = msgType === 'embed';
             const hasImage = !!m.image && m.image.trim().length > 0;
             const components = buildComponents(m.buttons);
 
@@ -229,10 +230,13 @@ export class SetupCommand extends Command {
 
               if (isEmbed) {
                 const embed = new EmbedBuilder();
-                if (m.embedTitle) embed.setTitle(m.embedTitle);
-                {
-                  const content = resolveSetupContent(m.content);
-                  if (content) embed.setDescription(content);
+                console.log('ciao');
+                if (m.embedTitle) {
+                  embed.setTitle(m.embedTitle);
+                }
+                const content = resolveSetupContent(m.content);
+                if (content) {
+                  embed.setDescription(content);
                 }
                 if (m.embedColor) {
                   const clr = colorMap[m.embedColor];
@@ -261,10 +265,12 @@ export class SetupCommand extends Command {
               // Create new message
               if (isEmbed) {
                 const embed = new EmbedBuilder();
-                if (m.embedTitle) embed.setTitle(m.embedTitle);
-                {
-                  const content = resolveSetupContent(m.content);
-                  if (content) embed.setDescription(content);
+                if (m.embedTitle) {
+                  embed.setTitle(m.embedTitle);
+                }
+                const content = resolveSetupContent(m.content);
+                if (content) {
+                  embed.setDescription(content);
                 }
                 if (m.embedColor) {
                   const clr = colorMap[m.embedColor];
