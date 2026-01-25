@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { autoInjectable } from "tsyringe";
 import { Listener } from '@sapphire/framework';
-import { GuildMember, ChannelType, ForumChannel } from 'discord.js';
+import { GuildMember, ChannelType, ForumChannel, EmbedBuilder } from 'discord.js';
 import { ConfigManager } from "../../managers/ConfigManager";
 
 @autoInjectable()
@@ -18,7 +18,8 @@ export class RemoveListener extends Listener {
   }
 
   public override async run(member: GuildMember) {
-    // 1) Prova a cancellare l'eventuale presentazione dell'utente (solo canale Forum)
+    // 1) Prova a recuperare l'eventuale presentazione dell'utente (solo canale Forum)
+    let presentationUrl: string | null = null;
     try {
       const presentationsChannelId = (this.configManager as ConfigManager).getPresentationsChannelId?.();
       if (presentationsChannelId) {
@@ -29,7 +30,6 @@ export class RemoveListener extends Listener {
         } else if (presChannel.type === ChannelType.GuildForum) {
           // Gestione Forum: i post sono thread
           const forum = presChannel as ForumChannel;
-          let deleted = 0;
           try {
             // Thread attivi
             const active = await forum.threads.fetchActive();
@@ -54,19 +54,20 @@ export class RemoveListener extends Listener {
                 } catch {}
 
                 if (isOwner || isStarterAuthor) {
-                  await thread.delete();
-                  deleted++;
-                  // piccolo delay per rate limit
-                  await new Promise(res => setTimeout(res, 200));
+                  // Memorizza l'URL del thread (se non già trovato)
+                  if (!presentationUrl) {
+                    try {
+                      presentationUrl = (thread as any)?.url ?? `https://discord.com/channels/${member.guild.id}/${thread.id}`;
+                    } catch {}
+                  }
+                  // Non cancellare la presentazione: si conserva solo l'URL
+                  break;
                 }
               } catch (e) {
-                console.warn(`Impossibile cancellare il thread ${thread.id} per l'utente ${member.id}:`, e);
+                console.warn(`Errore durante l'analisi del thread ${thread.id} per l'utente ${member.id}:`, e);
               }
             }
 
-            if (deleted > 0) {
-              console.log(`Cancellati ${deleted} thread di presentazione per l'utente ${member.id}.`);
-            }
           } catch (e) {
             console.error('Errore durante la gestione dei thread del forum di presentazioni:', e);
           }
@@ -78,15 +79,44 @@ export class RemoveListener extends Listener {
 
     // 2) Invia un messaggio nel canale server che l'utente è uscito
     try {
-      const channelId = this.configManager.getServerChannelId();
-      const channel = await member.guild.channels.fetch(channelId);
-
-      if (channel && channel.isTextBased()) {
-        const username = member.user?.tag ?? member.displayName ?? 'Utente sconosciuto';
-        await channel.send(`👋 L'utente ${username} ha lasciato il server.`);
-      }
+      await this.sendLeaveEmbed(member, presentationUrl ?? undefined);
     } catch (error) {
       console.error('Errore durante l\'invio dell\'avviso di uscita utente:', error);
     }
+  }
+
+  // Invia un embed di avviso quando un utente lascia il server
+  private async sendLeaveEmbed(member: GuildMember, presentationUrl?: string) {
+    const channelId = this.configManager.getServerChannelId();
+    const channel = await member.guild.channels.fetch(channelId);
+    if (!channel || !channel.isTextBased()) return;
+
+    const username = member.user?.tag ?? member.displayName ?? 'Utente sconosciuto';
+    const title = `👋 L'utente ${username} ha lasciato il server.`; // stesso testo della riga 86
+
+    const joinedAt = member.joinedAt ? new Date(member.joinedAt) : null;
+    const leftAt = new Date();
+
+    const formatDateTime = (d: Date | null) => d ? d.toLocaleString('it-IT') : 'N/D';
+
+    const bulletLines: string[] = [
+      `• Data di ingresso: ${formatDateTime(joinedAt)}`,
+      `• Data di uscita: ${formatDateTime(leftAt)}`,
+    ];
+
+    if (presentationUrl) {
+      bulletLines.push(`• Presentazione: ${presentationUrl}`);
+    }
+
+    const avatarUrl = member.user?.displayAvatarURL?.({ forceStatic: false, size: 512 }) ?? undefined;
+
+    const embed = new EmbedBuilder()
+      .setColor(this.configManager.getAlertColor())
+      .setTitle(title)
+      .setDescription(bulletLines.join('\n'));
+
+    if (avatarUrl) embed.setThumbnail(avatarUrl);
+
+    await channel.send({ embeds: [embed] });
   }
 }

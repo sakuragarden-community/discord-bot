@@ -111,4 +111,11 @@ export class ConfigManager {
         const primary = (config as any)?.colors?.primary ?? "#000000";
         return primary as ColorResolvable;
     }
+
+    // Ritorna il colore di alert definito nella config
+    public getAlertColor(): ColorResolvable
+    {
+        const alert = (config as any)?.colors?.alert ?? "#FFDA55";
+        return alert as ColorResolvable;
+    }
 }

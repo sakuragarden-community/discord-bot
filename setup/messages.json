@@ -228,8 +228,8 @@
       {
         "id": "new",
         "type": "embed",
-        "embedColor": "error",
-        "embedTitle": "1. Sakura Garden è una comunità pacifica, che professa libertà e uguaglianza.",
+        "embedColor": "alert",
+        "embedTitle": "1. Arte e Scrittura",
         "content": "rules/behavior/1.md",
         "image": "",
         "buttons": []
@@ -237,57 +237,48 @@
       {
         "id": "new",
         "type": "embed",
-        "embedColor": "error",
-        "embedTitle": "2. È anche una comunità civile, che esige rispetto e buon senso.",
-        "content": "rules/master/2.md",
+        "embedColor": "alert",
+        "embedTitle": "2. Videogiochi e Svago",
+        "content": "rules/behavior/2.md",
         "image": "",
         "buttons": []
       },
       {
         "id": "new",
         "type": "embed",
-        "embedColor": "error",
-        "embedTitle": "3. Si a gatti e memini, no ai discorsi da bar.",
-        "content": "rules/master/3.md",
+        "embedColor": "alert",
+        "embedTitle": "3. Arte NSFW",
+        "content": "rules/behavior/3.md",
         "image": "",
         "buttons": []
       },
       {
         "id": "new",
         "type": "embed",
-        "embedColor": "error",
-        "embedTitle": "4. Non è permesso lo spam non autorizzato.",
-        "content": "rules/master/4.md",
+        "embedColor": "alert",
+        "embedTitle": "4. Promozioni, Collaborazioni, Commissioni",
+        "content": "rules/behavior/4.md",
         "image": "",
         "buttons": []
       },
       {
         "id": "new",
         "type": "embed",
-        "embedColor": "error",
-        "embedTitle": "5. Evitate le molestie in privato, tanto vi beccheremo.",
-        "content": "rules/master/5.md",
+        "embedColor": "alert",
+        "embedTitle": "5. Infrazioni e Provvedimenti",
+        "content": "rules/behavior/5.md",
         "image": "",
         "buttons": []
       },
       {
         "id": "new",
         "type": "embed",
-        "embedColor": "error",
-        "embedTitle": "6. Qui non c'è spazio per i troll.",
-        "content": "rules/master/6.md",
-        "image": "",
-        "buttons": []
-      },
-      {
-        "id": "new",
-        "type": "embed",
-        "embedColor": "error",
-        "embedTitle": "7. Sforziamoci a fare arte senza l'intelligenza artificiale.",
-        "content": "rules/master/7.md",
+        "embedColor": "alert",
+        "embedTitle": "6. Segnalazioni",
+        "content": "rules/behavior/6.md",
         "image": "",
         "buttons": []
       }
     ]
-  },
+  }
 }

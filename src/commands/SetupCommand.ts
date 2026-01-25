@@ -86,6 +86,47 @@ function buildComponents(buttons?: SetupButton[]) {
   return rows.length > 0 ? rows : undefined;
 }
 
+async function clearTextChannel(channel: TextChannel): Promise<number> {
+  let totalDeleted = 0;
+  try {
+    // Loop until there are no messages left (or very few)
+    while (true) {
+      const fetched = await channel.messages.fetch({ limit: 100 });
+      if (!fetched || fetched.size === 0) break;
+
+      // Try bulk delete first for messages younger than 14 days
+      try {
+        const bulkCount = await channel.bulkDelete(fetched, true).catch(() => 0 as any);
+        const countNumber = typeof bulkCount === 'number' ? bulkCount : (bulkCount?.size ?? 0);
+        totalDeleted += countNumber;
+      } catch {}
+
+      // Delete remaining old messages individually
+      for (const msg of fetched.values()) {
+        try {
+          await msg.delete();
+          totalDeleted++;
+        } catch {
+          // ignore failures (e.g. permissions or already deleted)
+        }
+      }
+
+      // Small break to respect rate limits implicitly
+      await new Promise((r) => setTimeout(r, 500));
+
+      // Safety: if fewer than 100 returned, next fetch may return 0 soon
+      if (fetched.size < 100) {
+        // Check again quickly
+        const check = await channel.messages.fetch({ limit: 1 }).catch(() => null as any);
+        if (!check || check.size === 0) break;
+      }
+    }
+  } catch {
+    // ignore errors, return what we could delete
+  }
+  return totalDeleted;
+}
+
 @autoInjectable()
 export class SetupCommand extends Command {
   public constructor(
@@ -114,6 +155,12 @@ export class SetupCommand extends Command {
             .setName('subcategory')
             .setDescription('Se entity=messages, limita la pubblicazione alla sottocategoria specificata (es. "menu" o "rules")')
             .setRequired(false),
+        )
+        .addStringOption((option) =>
+          option
+            .setName('flags')
+            .setDescription('Flag opzionali. Usa "f" per pulire i messaggi del canale prima della pubblicazione')
+            .setRequired(false),
         ),
       {},
     );
@@ -122,6 +169,8 @@ export class SetupCommand extends Command {
   public override async chatInputRun(interaction: ChatInputCommandInteraction) {
     const entity = interaction.options.getString('entity', true);
     const subcategory = interaction.options.getString('subcategory');
+    const flagsRaw = interaction.options.getString('flags') || '';
+    const hasFlagF = flagsRaw.toLowerCase().includes('f');
 
     if (entity !== 'messages') {
       await interaction.reply({ content: 'Entità non supportata.', ephemeral: true });
@@ -187,6 +236,7 @@ export class SetupCommand extends Command {
       keys = [subcategory];
     }
 
+    const cleanedChannels = new Set<string>();
     for (const key of keys) {
       const section = payload[key];
       const chanId = (section as any)?.channelId ?? (section as any)?.channel_id;
@@ -201,6 +251,18 @@ export class SetupCommand extends Command {
         }
         const textChannel = ch as TextChannel;
 
+        // If cleanup flag is present, clear the channel once per channel before publishing
+        let channelWasCleared = false;
+        if (hasFlagF && !cleanedChannels.has(textChannel.id)) {
+          try {
+            await clearTextChannel(textChannel);
+            channelWasCleared = true;
+            cleanedChannels.add(textChannel.id);
+          } catch {
+            // Even if cleanup fails, proceed with sending to avoid blocking
+          }
+        }
+
         for (const m of section.messages) {
           total++;
           try {
@@ -214,7 +276,8 @@ export class SetupCommand extends Command {
             const hasImage = !!m.image && m.image.trim().length > 0;
             const components = buildComponents(m.buttons);
 
-            if (m.id && m.id !== 'new') {
+            const shouldCreateNew = !m.id || m.id === 'new' || channelWasCleared;
+            if (!shouldCreateNew) {
               // Edit existing message
               let existing: any = null;
               try {
