@@ -59,6 +59,11 @@ export class ConfigManager {
         return config.channels.main;
     }
 
+    public getMenuChannelId()
+    {
+        return (config as any)?.channels?.menu;
+    }
+
     public getPromoChannelId()
     {
         return config.channels.promo;
@@ -77,6 +82,16 @@ export class ConfigManager {
     public getPresentationsChannelId()
     {
         return (config as any)?.channels?.presentations;
+    }
+
+    public getEventsChannelId()
+    {
+        return (config as any)?.channels?.events;
+    }
+
+    public getSupportChannelId()
+    {
+        return (config as any)?.channels?.support;
     }
 
     public getDisboardBotId()

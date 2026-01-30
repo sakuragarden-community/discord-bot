@@ -1,5 +1,5 @@
-## Benvenut* in Sakura Garden, {{new_member}}!
-👋 **Siamo felici che tu sia qui!**
-➡️ Per sbloccare tutti i canali del server, **leggi le istruzioni per presentarti:** https://discord.com/channels/1302653623360294942/1337443969407254528
-࿐(🌸)࿐࿐(🌿)࿐࿐࿐(🌸)࿐(🌿)࿐࿐(🌸)࿐(🌸)࿐࿐(🌿)࿐࿐࿐(🌸)࿐ 
+👋 **Siamo felici che tu sia qui, {{new_member}}!**
+➡️ Vai al menu principale e scopri il nostro server: {{link}}
+🗣 Ricordati di presentarti in {{presentations}} per farti conoscere agli altri!
+🌸 Ti auguriamo buona permanenza!
 

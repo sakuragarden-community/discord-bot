@@ -1,11 +1,8 @@
-# 🌸  Benvenuto in Sakura Garden! 🌺
-## 🌸 Siamo una community di ragazzi che si dedica a:
-### 🫂 Social
-*Socializza con gli altri e immergiti in attività come visione di anime, sessioni D&D, giochi di carte o semplicemente 4 chiacchiere in vocal!*
-### 🎨 Arte
-*Troverai appasionati di disegno, illustrazione, fumetto, animazione, cosplay, fotografia, gamedev, 3D e artigianato!*
-### 🎮 Videogiochi
-*Divertiti con noi in videogiochi PvP o PvE come Overwatch 2, League of Legends, Terraria, Minecraft, Destiny 2 e altri ancora!*
-### 📝 Scrittura
-*Dai sfogo alla tua fantasia dando vita a mondi immaginari e personaggi carismatici.*
-## ➡️ [Diventa un nostro membro!](https://discord.com/channels/1302653623360294942/1337443969407254528)
+🌸 Il nostro giardino ti accoglie a braccia aperte, {{new_member}}!
+In questo server Discord avrai l'opportunità di **socializzare con nuove persone**, **condividere la tua arte**, **trovare compagni di gioco**, e **immergerti in fantastici eventi** divertenti per tutti!
+
+️️➡️ Nel canale {{menu}}, troverai una serie di comandi che ti guideranno nel server per scoprire tutte le attività che Sakura Garden offre ai suoi membri.
+
+🗣 Ti raccomandiamo di **presentarti nel canale** {{presentations}} per farti conoscere agli altri, mentre nel canale {{events}} oppure nel pulsante "Eventi" in alto a destra del server puoi scoprire **gli eventi dove puoi partecipare**, in modo da rompere il ghiaccio!
+
+🆘 Se hai bisogno di aiuto, contatta in privato un Amministratore o un Moderatore oppure vai nel canale {{support}} per scoprire come fare.

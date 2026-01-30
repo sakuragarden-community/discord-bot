@@ -280,5 +280,76 @@
         "buttons": []
       }
     ]
+  },
+  "events": {
+    "channelId": "1446166686670782554",
+    "messages": [
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://i.imgur.com/4yrTu9K.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "violet",
+        "embedTitle": "Divertiti negli eventi targati Sakura Garden!",
+        "content": "events/events.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://i.imgur.com/zLQpwfX.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "",
+        "buttons": [
+          {
+            "type": "link",
+            "label": "Un Libro al Mese \uD83D\uDCD8",
+            "url": "https://discord.com/channels/1367389015111897120/1466852551101251796"
+          }
+        ]
+      },
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://i.imgur.com/fN6Ky2f.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "",
+        "buttons": [
+          {
+            "type": "link",
+            "label": "Genshin Pull Party \uD83C\uDF20",
+            "url": "https://discord.com/channels/1367389015111897120/1466852612887281873"
+          }
+        ]
+      }
+    ]
   }
 }
