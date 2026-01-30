@@ -1,4 +1,4 @@
-> :herb:  **BENVENUTO IN SAKURA GARDEN**  :cherry_blossom:
+> :herb:  **BENVENUTO NEL NOSTRO GIARDINO DIGITALE**  :cherry_blossom:
 >  
 > La community ti accoglie a braccia aperte! :people_hugging:
 > Comincia ad esplorare il server **navigando nei canali**
