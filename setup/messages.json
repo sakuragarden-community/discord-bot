@@ -1,6 +1,6 @@
 {
   "menu": {
-    "channelId": "1367389015589781540",
+    "channelId": "1466940945110007818",
     "messages": [
       {
         "id": "new",
@@ -8,7 +8,7 @@
         "embedColor": "",
         "embedTitle": "",
         "content": "",
-        "image": "https://media.discordapp.net/attachments/1367389016957128791/1462402288982294725/menu-principale.png?ex=69755003&is=6973fe83&hm=92b91dda2a9ee491a5f8245612ef44375d96d4b1950debaa4aa82728e7e5c0ab&=&format=webp&quality=lossless",
+        "image": "https://sakuragarden.it/images/welcome.png",
         "buttons": []
       },
       {
@@ -26,7 +26,7 @@
         "embedColor": "",
         "embedTitle": "",
         "content": "",
-        "image": "https://media.discordapp.net/attachments/1367389016957128791/1462402289342873763/bannerino-menu-principale.png?ex=69755003&is=6973fe83&hm=d7a1646f590f783fcd32c70707a7fed868459c68c27d7e8c1852b55f37c2674d&=&format=webp&quality=lossless",
+        "image": "https://sakuragarden.it/images/menu.png",
         "buttons": []
       },
       {
@@ -40,7 +40,7 @@
           {
             "type": "link",
             "label": "\uD83D\uDDE3 Presentati alla community",
-            "url": "https://discord.com/channels/1367389015111897120/1406180933907910656"
+            "url": "https://discord.com/channels/1302653623360294942/1304845638823055431"
           },
           {
             "type": "link",
@@ -50,7 +50,7 @@
           {
             "type": "link",
             "label": "\uD83D\uDD18 Leggi il regolamento",
-            "url": "https://discord.com/channels/1367389015111897120/1367389015589781541"
+            "url": "https://discord.com/channels/1302653623360294942/1304799186788683858"
           }
         ]
       },
@@ -65,22 +65,22 @@
           {
             "type": "link",
             "label": "\uD83D\uDCAC Comincia a chattare",
-            "url": "https://discord.com/channels/1367389015111897120/1406182241767260200"
+            "url": "https://discord.com/channels/1302653623360294942/1304845556526616636"
           },
           {
             "type": "link",
             "label": "\uD83D\uDC8E Fai una donazione o boosta il server",
-            "url": "https://discord.com/channels/1367389015111897120/1462403653200511115"
+            "url": "https://discord.com/channels/1302653623360294942/1466975199802163272"
           },
           {
             "type": "link",
             "label": "\uD83E\uDE7A Apri un ticket di supporto",
-            "url": "https://discord.com/channels/1367389015111897120/1462403746704261302"
+            "url": "https://discord.com/channels/1302653623360294942/1466975041618182373"
           },
           {
             "type": "link",
             "label": "\uD83D\uDE0E Community Affiliate",
-            "url": "https://discord.com/channels/1367389015111897120/1462403135149572211"
+            "url": "https://discord.com/channels/1302653623360294942/1466974661773361425"
           }
         ]
       },
@@ -95,24 +95,24 @@
           {
             "type": "link",
             "label": "\uD83C\uDF89 I nostri eventi",
-            "url": "https://discord.com/channels/1367389015111897120/1446166686670782554"
+            "url": "https://discord.com/channels/1302653623360294942/1466943189309984910"
           },
           {
             "type": "link",
             "label": "\uD83D\uDD0B Server di Core Keeper",
-            "url": "https://discord.com/channels/1367389015111897120/1462512677028102225"
+            "url": "https://discord.com/channels/1302653623360294942/1466974536758071296"
           },
           {
             "type": "link",
             "label": "©\uFE0F Credits",
-            "url": "https://discord.com/channels/1367389015111897120/1462404237391564934"
+            "url": "https://discord.com/channels/1302653623360294942/1466974736515858598"
           }
         ]
       }
     ]
   },
   "rules": {
-    "channelId": "1367389015589781541",
+    "channelId": "1304799186788683858",
     "messages": [
       {
         "id": "new",
@@ -120,7 +120,7 @@
         "embedColor": "",
         "embedTitle": "",
         "content": "",
-        "image": "https://media.discordapp.net/attachments/1367389016957128791/1462620730557464730/Regolamento.png?ex=697572b4&is=69742134&hm=c7e714da4e1aba70a4c27c463c7444bc7bc7f9c01db2fbdfba12ac9c7517aaa8&=&format=webp&quality=lossless",
+        "image": "https://sakuragarden.it/images/rules.png",
         "buttons": []
       },
       {
@@ -143,19 +143,19 @@
           {
             "type": "link",
             "label": "\uD83D\uDFE5 Leggi le Regole Fondamentali di Condotta",
-            "url": "https://discord.com/channels/1367389015111897120/1462622806662447286"
+            "url": "https://discord.com/channels/1302653623360294942/1430835175654166558"
           },
           {
             "type": "link",
             "label": "\uD83D\uDFE8 Leggi il Regolamento Interno della Community",
-            "url": "https://discord.com/channels/1367389015111897120/1462622967388180592"
+            "url": "https://discord.com/channels/1302653623360294942/1430836952214671452"
           }
         ]
       }
     ]
   },
   "rulesMaster": {
-    "channelId": "1462622806662447286",
+    "channelId": "1430835175654166558",
     "messages": [
       {
         "id": "new",
@@ -223,7 +223,7 @@
     ]
   },
   "rulesBehavior": {
-    "channelId": "1462622967388180592",
+    "channelId": "1430836952214671452",
     "messages": [
       {
         "id": "new",
@@ -282,7 +282,7 @@
     ]
   },
   "events": {
-    "channelId": "1446166686670782554",
+    "channelId": "1466943189309984910",
     "messages": [
       {
         "id": "new",
@@ -290,7 +290,7 @@
         "embedColor": "",
         "embedTitle": "",
         "content": "",
-        "image": "https://i.imgur.com/4yrTu9K.png",
+        "image": "https://sakuragarden.it/images/eventi.png",
         "buttons": []
       },
       {
@@ -308,7 +308,7 @@
         "embedColor": "",
         "embedTitle": "",
         "content": "",
-        "image": "https://i.imgur.com/zLQpwfX.png",
+        "image": "https://sakuragarden.it/images/arte.png",
         "buttons": []
       },
       {
@@ -322,7 +322,7 @@
           {
             "type": "link",
             "label": "Un Libro al Mese \uD83D\uDCD8",
-            "url": "https://discord.com/channels/1367389015111897120/1466852551101251796"
+            "url": "https://discord.com/channels/1302653623360294942/1466975677038461120"
           }
         ]
       },
@@ -332,7 +332,7 @@
         "embedColor": "",
         "embedTitle": "",
         "content": "",
-        "image": "https://i.imgur.com/fN6Ky2f.png",
+        "image": "https://sakuragarden.it/images/videogiochi.png",
         "buttons": []
       },
       {
@@ -346,7 +346,7 @@
           {
             "type": "link",
             "label": "Genshin Pull Party \uD83C\uDF20",
-            "url": "https://discord.com/channels/1367389015111897120/1466852612887281873"
+            "url": "https://discord.com/channels/1302653623360294942/1466975586269401119"
           }
         ]
       }

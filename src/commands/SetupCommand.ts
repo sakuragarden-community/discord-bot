@@ -293,7 +293,6 @@ export class SetupCommand extends Command {
 
               if (isEmbed) {
                 const embed = new EmbedBuilder();
-                console.log('ciao');
                 if (m.embedTitle) {
                   embed.setTitle(m.embedTitle);
                 }
