@@ -351,5 +351,92 @@
         ]
       }
     ]
+  },
+  "donate": {
+    "channelId": "1466975199802163272",
+    "messages": [
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/sostienici.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "blue",
+        "embedTitle": ":link: Inserisci il link di invito al server nella tua bio",
+        "content": "donate/link.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "blue",
+        "embedTitle": ":gem: Potenzia il nostro server Discord",
+        "content": "donate/boost.md",
+        "image": "",
+        "buttons": []
+      }
+    ]
+  },
+  "support": {
+    "channelId": "1466975041618182373",
+    "messages": [
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/supporto.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "snow",
+        "embedTitle": ":question: Hai dubbi, domande o proposte di collaborazione?",
+        "content": "support/ask.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "snow",
+        "embedTitle": ":sos: Stai avendo problemi con un membro della community?",
+        "content": "support/help.md",
+        "image": "",
+        "buttons": []
+      }
+    ]
+  },
+  "credits": {
+    "channelId": "1466974736515858598",
+    "messages": [
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/credits.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "snow",
+        "embedTitle": "",
+        "content": "credits/info.md",
+        "image": "",
+        "buttons": []
+      }
+    ]
   }
 }

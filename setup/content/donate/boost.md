@@ -1,0 +1,7 @@
+I potenziamenti di Discord ci aiutano a sbloccare diverse funzionalità del server **come streaming full HD, nuovi slot per emoji, banner personalizzato, icona del server animata,** e tanto altro.
+Questi potenziamenti sono a pagamento, e puoi decidere di contribuire in due modi diversi:
+- **Acquistare un abbonamento Discord Nitro (consigliato)**: si tratta di un abbonamento di 10 € al mese, aggiunge 2 potenziamenti che puoi assegnare ai server Discord che preferisci, ed offre tantissimi vantaggi al tuo account Discord che puoi consultare [qui](https://discord.com/nitro). Puoi acquistarlo andando nelle impostazioni del tuo account (cliccando sull'ingranaggio in basso a destra) nella sezione "Nitro". Una volta comprato, clicca in altro a sinistra su ⁨`Potenziamenti`⁩ ed assegna uno o due potenziamenti al nostro server.
+- **Acquistare un singolo potenziamento (la più economica)**: si tratta di un abbonamento di 5 € circa al mese, che puoi decidere di disdire in qualunque momento. Per attivarlo, devi cliccare sul titolo del server in alto a sinistra e poi su ⁨`Potenziamento server`⁩.
+
+> **Ricompensa:** riceverai il ruolo ***"Sostenitore"*** che ti evidenzierà in alto al server!
+> Riceverai inoltre la targhetta ***"Sakurino d'Onore"***, contatta uno degli <@&1307488795230343258> per averla!

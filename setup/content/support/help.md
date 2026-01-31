@@ -1,0 +1,2 @@
+[Clicca qui per inviarci la tua segnalazione](https://forms.gle/Dr2g3wBPCzTiJAxf8), **si aprirà una pagina contenente un form per le segnalazioni.**
+Cerca di essere il più preciso possibile nelle informazioni, e allega delle prove affinché possiamo assicurarci della veridicità della segnalazione.

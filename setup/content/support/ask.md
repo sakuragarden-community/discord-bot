@@ -1,0 +1,1 @@
+Puoi scriverci all'indirizzo e-mail **sakuragarden.community@gmail.com** oppure contattare in privato uno degli <@&1307488795230343258>
