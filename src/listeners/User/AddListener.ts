@@ -36,7 +36,7 @@ export class AddListener extends Listener {
                     .setTitle('Grazie per essere entrato in Sakura Garden!')
                     .setColor(this.configManager.getPrimaryColor())
                     .setDescription(welcomeMessage)
-                    .setImage('https://i.imgur.com/IXIOJA2.png');
+                    .setImage('https://sakuragarden.it/images/wprivato.png');
                 await member.send({ embeds: [embed] });
             }
         } catch (error) {
@@ -55,7 +55,7 @@ export class AddListener extends Listener {
                     .setTitle('Un nuovo fiore è sbocciato in giardino!')
                     .setColor(this.configManager.getPrimaryColor())
                     .setDescription(welcomeMessage)
-                    .setImage('https://i.imgur.com/b3VieM2.png');
+                    .setImage('https://sakuragarden.it/images/wpubblico.png');
                 await channel.send({ content: '## ' + member.toString() + ' è entrato nella community!', embeds: [embed] });
             }
         } catch (error) {
