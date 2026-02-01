@@ -5,7 +5,7 @@ import { ConfigManager, InterestMapItem } from './ConfigManager';
 /**
  * Manager per sincronizzare i membri dei ruoli con i rispettivi thread di interesse.
  */
-export class InterestsMapManager {
+export class InterestsManager {
   constructor(private readonly configManager: ConfigManager = new ConfigManager()) {}
 
   /**
