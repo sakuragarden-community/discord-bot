@@ -57,8 +57,8 @@ export class BumpReminderListener extends Listener {
                     const ch = await message.client.channels.fetch(targetChannelId);
                     if (ch && (ch as any).isTextBased && (ch as any).isTextBased() && 'send' in (ch as any)) {
                         const embed = new EmbedBuilder()
-                            .setTitle('⏰ Promemoria Disboard')
-                            .setDescription('Sono passate 2 ore! Ricordatevi di avviare di nuovo il comando per fare up su Disboard.')
+                            .setTitle('⏰ Promemoria Bump')
+                            .setDescription('Sono passate 2 ore! Ricordatevi di avviare di nuovo il comando per fare bump su Disboard.')
                             .setColor(this.configManager?.getPrimaryColor() ?? 0xF39595);
 
                         await (ch as any).send({ embeds: [embed] });
