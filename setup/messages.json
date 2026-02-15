@@ -99,11 +99,6 @@
           },
           {
             "type": "link",
-            "label": "\uD83D\uDD0B Server di Core Keeper",
-            "url": "https://discord.com/channels/1302653623360294942/1466974536758071296"
-          },
-          {
-            "type": "link",
             "label": "©\uFE0F Credits",
             "url": "https://discord.com/channels/1302653623360294942/1466974736515858598"
           }
@@ -346,7 +341,7 @@
           {
             "type": "link",
             "label": "Genshin Pull Party \uD83C\uDF20",
-            "url": "https://discord.com/channels/1302653623360294942/1466975586269401119"
+            "url": "https://discord.com/channels/1302653623360294942/1466977097582117119/1467840211785355401"
           }
         ]
       }
@@ -436,6 +431,44 @@
         "content": "credits/info.md",
         "image": "",
         "buttons": []
+      }
+    ]
+  },
+  "discordGames": {
+    "channelId": "1466944156642316570",
+    "messages": [
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/discordgames.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "primary",
+        "embedTitle": "\uD83C\uDFB2 Prova i giochi di Discord ospitati su Sakura Garden!",
+        "content": "games/discord.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "",
+        "buttons": [
+          {
+            "type": "link",
+            "label": "TacoShack \uD83C\uDF2E",
+            "url": "https://discord.com/channels/1302653623360294942/1472647742693183593"
+          }
+        ]
       }
     ]
   }
