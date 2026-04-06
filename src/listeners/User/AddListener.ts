@@ -49,7 +49,7 @@ export class AddListener extends Listener {
             welcomeMessage = welcomeMessage.replace('{{link}}', `<#${this.configManager.getMenuChannelId()}>`);
             welcomeMessage = welcomeMessage.replace('{{new_member}}', member.toString());
             welcomeMessage = welcomeMessage.replace('{{presentations}}', `<#${this.configManager.getPresentationsChannelId()}>`);
-            let channel = await guild.channels.fetch(this.configManager.getMainChannelId());
+            let channel = await guild.channels.fetch(this.configManager.getNewChannelId());
             if (channel && channel.isTextBased()) {
                 const embed = new EmbedBuilder()
                     .setTitle('Un nuovo fiore è sbocciato in giardino!')

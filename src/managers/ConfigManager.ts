@@ -65,6 +65,11 @@ export class ConfigManager {
         return config.channels.main;
     }
 
+    public getNewChannelId()
+    {
+        return (config as any)?.channels?.new;
+    }
+
     public getMenuChannelId()
     {
         return (config as any)?.channels?.menu;
