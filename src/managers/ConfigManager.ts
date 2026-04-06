@@ -3,12 +3,6 @@ import config from "../../config.json"
 import { Guild, ColorResolvable } from "discord.js";
 import { container } from '@sapphire/framework';
 
-export interface InterestMapItem {
-    name: string;
-    role: string; // role ID
-    thread: string; // thread ID
-}
-
 export class ConfigManager {
 
     protected guild: Guild|null = null;
@@ -143,10 +137,5 @@ export class ConfigManager {
     {
         const alert = (config as any)?.colors?.alert ?? "#FFDA55";
         return alert as ColorResolvable;
-    }
-
-    // Ritorna l'elenco degli interessi mappati dalla config
-    public getInterestsMap(): InterestMapItem[] {
-        return ((config as any)?.interestsMap ?? []) as InterestMapItem[];
     }
 }
