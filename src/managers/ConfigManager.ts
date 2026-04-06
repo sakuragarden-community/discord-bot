@@ -99,6 +99,16 @@ export class ConfigManager {
         return (config as any)?.channels?.support;
     }
 
+    public getGalleriesChannelId()
+    {
+        return (config as any)?.channels?.galleries;
+    }
+
+    public getTopChannelId()
+    {
+        return (config as any)?.channels?.top;
+    }
+
     public getDisboardBotId()
     {
         return (config as any)?.bots?.disboard;
@@ -137,5 +147,12 @@ export class ConfigManager {
     {
         const alert = (config as any)?.colors?.alert ?? "#FFDA55";
         return alert as ColorResolvable;
+    }
+
+    // Ritorna il colore blu definito nella config
+    public getBlueColor(): ColorResolvable
+    {
+        const blue = (config as any)?.colors?.blue ?? "#0000FF";
+        return blue as ColorResolvable;
     }
 }
