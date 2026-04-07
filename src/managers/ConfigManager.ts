@@ -79,6 +79,11 @@ export class ConfigManager {
         return config.channels.server;
     }
 
+    public getNewsChannelId()
+    {
+        return (config as any)?.channels?.news;
+    }
+
     public getCommandsChannelId()
     {
         return (config as any)?.channels?.commands;
@@ -107,6 +112,11 @@ export class ConfigManager {
     public getTopChannelId()
     {
         return (config as any)?.channels?.top;
+    }
+
+    public getFreetalkChannelId()
+    {
+        return (config as any)?.channels?.freetalk;
     }
 
     public getDisboardBotId()
@@ -142,6 +152,12 @@ export class ConfigManager {
         return primary as ColorResolvable;
     }
 
+    public getSecondaryColor(): ColorResolvable
+    {
+        const secondary = (config as any)?.colors?.secondary ?? "#000000";
+        return secondary as ColorResolvable;
+    }
+
     // Ritorna il colore di alert definito nella config
     public getAlertColor(): ColorResolvable
     {
@@ -154,5 +170,12 @@ export class ConfigManager {
     {
         const blue = (config as any)?.colors?.blue ?? "#0000FF";
         return blue as ColorResolvable;
+    }
+
+    // Ritorna il colore violet definito nella config
+    public getVioletColor(): ColorResolvable
+    {
+        const violet = (config as any)?.colors?.violet ?? "#EE82EE";
+        return violet as ColorResolvable;
     }
 }

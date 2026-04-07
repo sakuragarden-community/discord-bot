@@ -317,31 +317,7 @@
           {
             "type": "link",
             "label": "Un Libro al Mese \uD83D\uDCD8",
-            "url": "https://discord.com/channels/1302653623360294942/1466975677038461120"
-          }
-        ]
-      },
-      {
-        "id": "new",
-        "type": "default",
-        "embedColor": "",
-        "embedTitle": "",
-        "content": "",
-        "image": "https://sakuragarden.it/images/videogiochi.png",
-        "buttons": []
-      },
-      {
-        "id": "new",
-        "type": "default",
-        "embedColor": "",
-        "embedTitle": "",
-        "content": "",
-        "image": "",
-        "buttons": [
-          {
-            "type": "link",
-            "label": "Genshin Pull Party \uD83C\uDF20",
-            "url": "https://discord.com/channels/1302653623360294942/1466977097582117119/1467840211785355401"
+            "url": "https://discord.com/channels/1302653623360294942/1490759610603405510"
           }
         ]
       }

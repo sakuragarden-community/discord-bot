@@ -37,11 +37,23 @@ export class TopActivitiesListener extends Listener {
 
             const opener = thread.ownerId ? `<@${thread.ownerId}>` : 'Qualcuno';
 
+            // Recupera avatar dell'autore per usarlo come icona nell'embed
+            let authorName = 'Autore';
+            let authorIcon: string | undefined = undefined;
+            if (thread.ownerId) {
+                try {
+                    const user = await thread.client.users.fetch(thread.ownerId);
+                    authorName = (user as any)?.tag ?? (user as any)?.username ?? authorName;
+                    authorIcon = (user as any)?.displayAvatarURL?.({ size: 128 }) ?? undefined;
+                } catch {}
+            }
+
             // Prepara embed
             const embed = new EmbedBuilder()
-                .setTitle("E' stata creata una nuova raccolta di foto!")
+                .setTitle("📸 E' stata creata una nuova raccolta di foto!")
                 .setColor(this.configManager?.getBlueColor() ?? 0x7EBDC3)
-                .setDescription(`${opener} ha aperto la raccolta intitolato '${topicTitle}', vai a vedere cosa si tratta e partecipa!\n[Clicca qui per aprire la raccolta.](${topicUrl})`);
+                .setDescription(`${opener} ha aperto la raccolta intitolato **"${topicTitle}"**, vai a vedere cosa si tratta e partecipa!\n[Clicca qui per aprire la raccolta.](${topicUrl})`)
+                .setAuthor({ name: authorName, iconURL: authorIcon });
 
             // Pubblica una notifica nel canale "top" (testuale normale) inviando direttamente l'embed
             const topChannel = await thread.client.channels.fetch(topId);
