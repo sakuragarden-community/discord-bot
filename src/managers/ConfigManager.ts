@@ -54,6 +54,12 @@ export class ConfigManager {
         return config.roles.types.member;
     }
 
+    // Opzioni ruoli
+    public getDisableFindPlayerRoleId()
+    {
+        return (config as any)?.roles?.options?.disableFindPlayer;
+    }
+
     public getMainChannelId()
     {
         return config.channels.main;
@@ -117,6 +123,11 @@ export class ConfigManager {
     public getFreetalkChannelId()
     {
         return (config as any)?.channels?.freetalk;
+    }
+
+    public getFindplayerChannelId()
+    {
+        return (config as any)?.channels?.findplayer;
     }
 
     public getDisboardBotId()
