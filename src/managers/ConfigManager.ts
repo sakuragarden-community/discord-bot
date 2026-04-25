@@ -34,6 +34,11 @@ export class ConfigManager {
         return config.roles.types.moderator;
     }
 
+    public getHelperRoleId()
+    {
+        return (config as any)?.roles?.types?.helper;
+    }
+
     public getCollaboratorRoleId()
     {
         return config.roles.types.collaborator;
@@ -176,6 +181,12 @@ export class ConfigManager {
         return alert as ColorResolvable;
     }
 
+    public getErrorColor(): ColorResolvable
+    {
+        const error = (config as any)?.colors?.error ?? "#FF5555";
+        return error as ColorResolvable;
+    }
+
     // Ritorna il colore blu definito nella config
     public getBlueColor(): ColorResolvable
     {
@@ -188,5 +199,19 @@ export class ConfigManager {
     {
         const violet = (config as any)?.colors?.violet ?? "#EE82EE";
         return violet as ColorResolvable;
+    }
+
+    // Categoria testuale dove è vietato menzionare ruoli (eccetto canale findplayer)
+    // ID fornito nella specifica: 1304844728730386462
+    public getSearchPlayersCategoryId(): string
+    {
+        return "1304844728730386462";
+    }
+
+    // Utente esente dalla cancellazione dei messaggi in #findplayer
+    public getFindplayerExemptUserId(): string
+    {
+        // ID fornito nella specifica
+        return "1349839010490617918";
     }
 }
