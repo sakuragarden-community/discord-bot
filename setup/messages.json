@@ -447,5 +447,37 @@
         ]
       }
     ]
+  },
+  "findPlayer": {
+    "channelId": "1497517876007931914",
+    "messages": [
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/cercagiocatori.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "violet",
+        "embedTitle": "Trova nuovi amici con gui giocare! ✨",
+        "content": "videogames/findplayer.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "alert",
+        "embedTitle": "Non vuoi ricevere le notifiche o non ti interessa la funzione di ricerca?",
+        "content": "",
+        "image": "videogames/disablefindplayer.md",
+        "buttons": []
+      }
+    ]
   }
 }
