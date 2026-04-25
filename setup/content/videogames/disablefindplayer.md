@@ -1,1 +1,3 @@
-🔕 Puoi disabilitare la funzione di "Cerca Giocatori" e le sue notifiche andando su "Canali e ruoli" => "Personalizza" e premendo su "Si, disabilita" alla domanda "Vuoi disabilitare la funzione "Cerca Giocatori" e le sue notifiche?". Puoi ripristinare la funzione in qualunque momento semplicemente togliendo la spunta all'opzione.
+🔕 **Puoi disabilitare la funzione di "Cerca Giocatori" e le sue notifiche** andando su `"Canali e ruoli" > "Personalizza"` e premendo su `Si, disabilita` alla domanda `Vuoi disabilitare la funzione "Cerca Giocatori" e le sue notifiche?`. 
+
+🕰️ Puoi ripristinare la funzione in qualunque momento semplicemente togliendo la spunta all'opzione.

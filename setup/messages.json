@@ -474,8 +474,8 @@
         "type": "embed",
         "embedColor": "alert",
         "embedTitle": "Non vuoi ricevere le notifiche o non ti interessa la funzione di ricerca?",
-        "content": "",
-        "image": "videogames/disablefindplayer.md",
+        "content": "videogames/disablefindplayer.md",
+        "image": "",
         "buttons": []
       }
     ]
