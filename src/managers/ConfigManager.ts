@@ -150,12 +150,32 @@ export class ConfigManager {
         return (config as any)?.triggers?.vocal;
     }
 
+    public getNsfwVocalTriggerChannelId()
+    {
+        return (config as any)?.triggers?.nsfw;
+    }
+
+    public getFocusVocalTriggerChannelId()
+    {
+        return (config as any)?.triggers?.focus;
+    }
+
     public getVoiceMaxUsers(): number
     {
         const raw = (config as any)?.voice?.maxUsers;
         let max = Number.isInteger(raw) ? raw as number : parseInt(String(raw ?? 10), 10);
         if (!Number.isFinite(max) || isNaN(max)) max = 10;
         // Discord user limit: 0 means unlimited; typical range 1..99. Clamp to 0..99 just in case.
+        if (max < 0) max = 0;
+        if (max > 99) max = 99;
+        return max;
+    }
+
+    public getVoiceMaxUsersFocus(): number
+    {
+        const raw = (config as any)?.voice?.maxUsersFocus;
+        let max = Number.isInteger(raw) ? raw as number : parseInt(String(raw ?? 10), 10);
+        if (!Number.isFinite(max) || isNaN(max)) max = 10;
         if (max < 0) max = 0;
         if (max > 99) max = 99;
         return max;
