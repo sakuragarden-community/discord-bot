@@ -479,5 +479,29 @@
         "buttons": []
       }
     ]
+  },
+  "voicesGuide": {
+    "channelId": "1501299455767482508",
+    "messages": [
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/guidavocali.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "primary",
+        "embedTitle": "❓ Come funzionano i canali vocali di Sakura Garden?",
+        "content": "voices/guide.md",
+        "image": "",
+        "buttons": []
+      }
+    ]
   }
 }
+
