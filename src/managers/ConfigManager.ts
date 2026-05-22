@@ -65,6 +65,12 @@ export class ConfigManager {
         return (config as any)?.roles?.options?.disableFindPlayer;
     }
 
+    // Ruoli di interesse
+    public getPartygamesRoleId()
+    {
+        return (config as any)?.roles?.interest?.partygames;
+    }
+
     public getMainChannelId()
     {
         return config.channels.main;
