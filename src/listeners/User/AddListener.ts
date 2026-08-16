@@ -30,15 +30,12 @@ export class AddListener extends Listener {
             welcomeMessage = welcomeMessage.replace('{{presentations}}', `<#${this.configManager.getPresentationsChannelId()}>`);
             welcomeMessage = welcomeMessage.replace('{{support}}', `<#${this.configManager.getSupportChannelId()}>`);
             welcomeMessage = welcomeMessage.replace('{{events}}', `<#${this.configManager.getEventsChannelId()}>`);
-            let channel = await guild.channels.fetch(this.configManager.getMainChannelId());
-            if (channel && channel.isTextBased()) {
-                const embed = new EmbedBuilder()
-                    .setTitle('Grazie per essere entrato in Sakura Garden!')
-                    .setColor(this.configManager.getPrimaryColor())
-                    .setDescription(welcomeMessage)
-                    .setImage('https://sakuragarden.it/images/wprivato.png');
-                await member.send({ embeds: [embed] });
-            }
+            const embed = new EmbedBuilder()
+                .setTitle('Grazie per essere entrato in Sakura Garden!')
+                .setColor(this.configManager.getPrimaryColor())
+                .setDescription(welcomeMessage)
+                .setImage('https://sakuragarden.it/images/wprivato.png');
+            await member.send({ embeds: [embed] });
         } catch (error) {
             console.error(error);
         }

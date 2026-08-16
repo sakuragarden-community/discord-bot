@@ -8,6 +8,7 @@ export class ConfigManager {
     protected guild: Guild|null = null;
 
     public async getGuild() {
+        console.log(config.guild);
         if (!this.guild) {
             this.guild = await container.client.guilds.fetch(config.guild)
         }

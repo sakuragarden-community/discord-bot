@@ -8,7 +8,7 @@
         "embedColor": "",
         "embedTitle": "",
         "content": "",
-        "image": "https://sakuragarden.it/images/welcome.png",
+        "image": "https://i.imgur.com/UKRX14E.png",
         "buttons": []
       },
       {
@@ -71,26 +71,6 @@
             "type": "link",
             "label": "\uD83D\uDC8E Fai una donazione o boosta il server",
             "url": "https://discord.com/channels/1302653623360294942/1466975199802163272"
-          },
-          {
-            "type": "link",
-            "label": "\uD83D\uDE0E Community Affiliate",
-            "url": "https://discord.com/channels/1302653623360294942/1466974661773361425"
-          }
-        ]
-      },
-      {
-        "id": "new",
-        "type": "default",
-        "embedColor": "",
-        "embedTitle": "",
-        "content": "",
-        "image": "",
-        "buttons": [
-          {
-            "type": "link",
-            "label": "\uD83C\uDF89 I nostri eventi",
-            "url": "https://discord.com/channels/1302653623360294942/1466943189309984910"
           },
           {
             "type": "link",
