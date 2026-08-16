@@ -2,6 +2,8 @@ import 'reflect-metadata';
 import {SapphireClient} from '@sapphire/framework';
 import {GatewayIntentBits, Partials} from 'discord.js';
 import dotenv from 'dotenv';
+import { ApplicationCommandRegistries, RegisterBehavior } from '@sapphire/framework';
+
 
 const client = new SapphireClient({
     intents: [
@@ -12,6 +14,8 @@ const client = new SapphireClient({
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildMessageReactions,
         GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildScheduledEvents,
+        GatewayIntentBits.GuildVoiceStates,
     ],
     partials: [
         Partials.Channel,
@@ -26,3 +30,9 @@ const client = new SapphireClient({
 dotenv.config();
 
 client.login(process.env.TOKEN);
+
+if (process.env.MODE === 'staging') {
+    client.login(process.env.TOKEN_STAGING);
+} else {
+
+}

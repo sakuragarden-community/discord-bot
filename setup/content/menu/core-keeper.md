@@ -1,0 +1,1 @@
+Attendi l'arrivo dell'evento per trovare le informazioni del server!

@@ -1,0 +1,4 @@
+- **Regole Fondamentali di Condotta** 
+  - :x: La violazione delle Regole Fondamentali di Condotta comporta l'espulsione immediata dal server o strike di regolamento (al 3° si verrà bannati).
+- **Regolamento Interno della Community**
+  - :warning: La violazione del Regolamento Interno della Community comporta richiami personali, timeout di alcune ore o sospensione temporanea dal server.

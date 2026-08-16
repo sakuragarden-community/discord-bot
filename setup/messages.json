@@ -1,0 +1,482 @@
+{
+  "menu": {
+    "channelId": "1466940945110007818",
+    "messages": [
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://i.imgur.com/UKRX14E.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "menu/welcome.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/menu.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "",
+        "buttons": [
+          {
+            "type": "link",
+            "label": "\uD83D\uDDE3 Presentati alla community",
+            "url": "https://discord.com/channels/1302653623360294942/1304845638823055431"
+          },
+          {
+            "type": "link",
+            "label": "ℹ\uFE0F Seguici su Instagram",
+            "url": "https://www.instagram.com/sakura.garden/"
+          },
+          {
+            "type": "link",
+            "label": "\uD83D\uDD18 Leggi il regolamento",
+            "url": "https://discord.com/channels/1302653623360294942/1304799186788683858"
+          }
+        ]
+      },
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "",
+        "buttons": [
+          {
+            "type": "link",
+            "label": "\uD83D\uDCAC Comincia a chattare",
+            "url": "https://discord.com/channels/1302653623360294942/1304845556526616636"
+          },
+          {
+            "type": "link",
+            "label": "\uD83D\uDC8E Fai una donazione o boosta il server",
+            "url": "https://discord.com/channels/1302653623360294942/1466975199802163272"
+          },
+          {
+            "type": "link",
+            "label": "©\uFE0F Credits",
+            "url": "https://discord.com/channels/1302653623360294942/1466974736515858598"
+          }
+        ]
+      }
+    ]
+  },
+  "rules": {
+    "channelId": "1304799186788683858",
+    "messages": [
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/rules.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "green",
+        "embedTitle": "Il regolamento di Sakura Garden è suddiviso in due parti:",
+        "content": "rules/intro.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "",
+        "buttons": [
+          {
+            "type": "link",
+            "label": "\uD83D\uDFE5 Leggi le Regole Fondamentali di Condotta",
+            "url": "https://discord.com/channels/1302653623360294942/1430835175654166558"
+          },
+          {
+            "type": "link",
+            "label": "\uD83D\uDFE8 Leggi il Regolamento Interno della Community",
+            "url": "https://discord.com/channels/1302653623360294942/1430836952214671452"
+          }
+        ]
+      }
+    ]
+  },
+  "rulesMaster": {
+    "channelId": "1430835175654166558",
+    "messages": [
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "1. Sakura Garden è una comunità pacifica, che professa libertà e uguaglianza.",
+        "content": "rules/master/1.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "2. È anche una comunità civile, che esige rispetto e buon senso.",
+        "content": "rules/master/2.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "3. Si a gatti e memini, no ai discorsi da bar.",
+        "content": "rules/master/3.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "4. Non è permesso lo spam non autorizzato.",
+        "content": "rules/master/4.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "5. Evitate le molestie in privato, tanto vi beccheremo.",
+        "content": "rules/master/5.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "6. Qui non c'è spazio per i troll.",
+        "content": "rules/master/6.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "error",
+        "embedTitle": "7. Sforziamoci a fare arte senza l'intelligenza artificiale.",
+        "content": "rules/master/7.md",
+        "image": "",
+        "buttons": []
+      }
+    ]
+  },
+  "rulesBehavior": {
+    "channelId": "1430836952214671452",
+    "messages": [
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "alert",
+        "embedTitle": "1. Arte e Scrittura",
+        "content": "rules/behavior/1.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "alert",
+        "embedTitle": "2. Videogiochi e Svago",
+        "content": "rules/behavior/2.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "alert",
+        "embedTitle": "3. Arte NSFW",
+        "content": "rules/behavior/3.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "alert",
+        "embedTitle": "4. Promozioni, Collaborazioni, Commissioni",
+        "content": "rules/behavior/4.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "alert",
+        "embedTitle": "5. Infrazioni e Provvedimenti",
+        "content": "rules/behavior/5.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "alert",
+        "embedTitle": "6. Segnalazioni",
+        "content": "rules/behavior/6.md",
+        "image": "",
+        "buttons": []
+      }
+    ]
+  },
+  "events": {
+    "channelId": "1466943189309984910",
+    "messages": [
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/eventi.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "violet",
+        "embedTitle": "Divertiti negli eventi targati Sakura Garden!",
+        "content": "events/events.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/arte.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "",
+        "buttons": [
+          {
+            "type": "link",
+            "label": "Un Libro al Mese \uD83D\uDCD8",
+            "url": "https://discord.com/channels/1302653623360294942/1490759610603405510"
+          }
+        ]
+      }
+    ]
+  },
+  "donate": {
+    "channelId": "1466975199802163272",
+    "messages": [
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/sostienici.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "blue",
+        "embedTitle": ":link: Inserisci il link di invito al server nella tua bio",
+        "content": "donate/link.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "blue",
+        "embedTitle": ":gem: Potenzia il nostro server Discord",
+        "content": "donate/boost.md",
+        "image": "",
+        "buttons": []
+      }
+    ]
+  },
+  "support": {
+    "channelId": "1507389779980062901",
+    "messages": [
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/supporto.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "snow",
+        "embedTitle": ":question: Hai dubbi, domande o proposte di collaborazione?",
+        "content": "support/ask.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "snow",
+        "embedTitle": ":sos: Stai avendo problemi con un membro della community?",
+        "content": "support/help.md",
+        "image": "",
+        "buttons": []
+      }
+    ]
+  },
+  "credits": {
+    "channelId": "1466974736515858598",
+    "messages": [
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/credits.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "snow",
+        "embedTitle": "",
+        "content": "credits/info.md",
+        "image": "",
+        "buttons": []
+      }
+    ]
+  },
+  "discordGames": {
+    "channelId": "1466944156642316570",
+    "messages": [
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/discordgames.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "primary",
+        "embedTitle": "\uD83C\uDFB2 Prova i giochi di Discord ospitati su Sakura Garden!",
+        "content": "games/discord.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "",
+        "buttons": [
+          {
+            "type": "link",
+            "label": "TacoShack \uD83C\uDF2E",
+            "url": "https://discord.com/channels/1302653623360294942/1472647742693183593"
+          }
+        ]
+      }
+    ]
+  },
+  "findPlayer": {
+    "channelId": "1497517876007931914",
+    "messages": [
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/cercagiocatori.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "violet",
+        "embedTitle": "Trova nuovi amici con gui giocare! ✨",
+        "content": "videogames/findplayer.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "alert",
+        "embedTitle": "Non vuoi ricevere le notifiche o non ti interessa la funzione di ricerca?",
+        "content": "videogames/disablefindplayer.md",
+        "image": "",
+        "buttons": []
+      }
+    ]
+  },
+  "voicesGuide": {
+    "channelId": "1501299455767482508",
+    "messages": [
+      {
+        "id": "new",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/guidavocali.png",
+        "buttons": []
+      },
+      {
+        "id": "new",
+        "type": "embed",
+        "embedColor": "primary",
+        "embedTitle": "❓ Come funzionano i canali vocali di Sakura Garden?",
+        "content": "voices/guide.md",
+        "image": "",
+        "buttons": []
+      }
+    ]
+  }
+}
+
