@@ -4,6 +4,7 @@ import { Listener } from '@sapphire/framework';
 import {DMChannel, GuildMember, Message, User, EmbedBuilder} from "discord.js";
 import * as fs from "fs";
 import {ConfigManager} from "../../managers/ConfigManager";
+import {MemberManager} from "../../managers/MemberManager";
 
 @autoInjectable()
 export class AddListener extends Listener {
@@ -12,6 +13,7 @@ export class AddListener extends Listener {
         context: Listener.LoaderContext,
         options: Listener.Options,
         protected configManager: ConfigManager,
+        protected memberManager: MemberManager,
     ) {
         super(context, {
             ...options,
@@ -20,6 +22,17 @@ export class AddListener extends Listener {
     }
 
     public override async run(member: GuildMember) {
+        await this.sendWelcomeMessages(member);
+
+        try {
+            await this.createMember(member);
+        } catch (error) {
+            console.error("Errore durante la registrazione del membro sulle API Kodama:", error);
+        }
+    }
+
+    /** Invia i messaggi di benvenuto in privato e nel canale pubblico. */
+    protected async sendWelcomeMessages(member: GuildMember) {
         let guild = await this.configManager.getGuild();
 
         // Invia messaggio di benvenuto in privato
@@ -58,11 +71,16 @@ export class AddListener extends Listener {
         } catch (error) {
             console.error(error);
         }
+    }
 
-        // Assegna ruoli di base
-        this.configManager.getInitRolesId().forEach(id => {
-            member.roles.add(id);
-        })
+    /** Registra il nuovo membro sulle API Kodama. */
+    protected async createMember(member: GuildMember) {
+        return this.memberManager.create({
+            discordId: member.id,
+            username: member.user.username,
+            joinedAt: member.joinedAt?.toISOString() ?? null,
+            status: "ACTIVE",
+        });
     }
 
 }

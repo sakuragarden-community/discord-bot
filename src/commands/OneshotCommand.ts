@@ -3,7 +3,7 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { autoInjectable } from 'tsyringe';
 import axios from 'axios';
 import { ConfigManager } from '../managers/ConfigManager';
-import { KodamaApiManager } from '../managers/KodamaApiManager';
+import { ApiManager } from '../managers/ApiManager';
 
 @autoInjectable()
 export class OneshotCommand extends Command {
@@ -11,7 +11,7 @@ export class OneshotCommand extends Command {
     context: Command.Context,
     options: Command.Options,
     protected configManager?: ConfigManager,
-    protected kodamaApiManager?: KodamaApiManager,
+    protected apiManager?: ApiManager,
   ) {
     super(context, { ...options });
   }
@@ -39,7 +39,7 @@ export class OneshotCommand extends Command {
     }
 
     try {
-      const token = await this.kodamaApiManager!.getBearerToken();
+      const token = await this.apiManager!.getBearerToken();
 
       await axios.post(
         `${process.env.KODAMA_API_BASE_URL}/api/v1/members`,
