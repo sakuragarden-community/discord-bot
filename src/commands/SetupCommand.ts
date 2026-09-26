@@ -4,7 +4,7 @@ import { autoInjectable } from 'tsyringe';
 import fs from 'fs';
 import path from 'path';
 import config from '../../config.json';
-import { ConfigManager } from '../managers/ConfigManager';
+import { SettingsManager } from '../managers/SettingsManager';
 
 interface SetupButton {
   type: 'link';
@@ -149,7 +149,7 @@ export class SetupCommand extends Command {
   public constructor(
     context: Command.Context,
     options: Command.Options,
-    protected configManager?: ConfigManager,
+    protected settingsManager?: SettingsManager,
   ) {
     super(context, { ...options });
   }

@@ -3,7 +3,7 @@ import { autoInjectable } from "tsyringe";
 import { Listener } from '@sapphire/framework';
 import cron from 'node-cron';
 import { ChannelType, GuildTextBasedChannel, Message } from 'discord.js';
-import { ConfigManager } from "../../managers/ConfigManager";
+import { SettingsManager } from "../../managers/SettingsManager";
 
 @autoInjectable()
 export class FindplayerCleanupCron extends Listener {
@@ -12,7 +12,7 @@ export class FindplayerCleanupCron extends Listener {
   public constructor(
     context: Listener.LoaderContext,
     options: Listener.Options,
-    protected configManager?: ConfigManager,
+    protected settingsManager?: SettingsManager,
   ) {
     super(context, {
       ...options,
@@ -40,8 +40,8 @@ export class FindplayerCleanupCron extends Listener {
   }
 
   private async cleanupFindplayer() {
-    const cfg = this.configManager as ConfigManager;
-    const channelId = cfg.getFindplayerChannelId?.();
+    const cfg = this.settingsManager as SettingsManager;
+    const channelId = await cfg.getFindplayerChannelId?.();
     if (!channelId) return;
 
     const guild = await cfg.getGuild();

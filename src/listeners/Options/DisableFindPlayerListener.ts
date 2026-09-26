@@ -2,14 +2,14 @@ import "reflect-metadata";
 import { autoInjectable } from "tsyringe";
 import { Listener } from '@sapphire/framework';
 import { GuildMember, PermissionFlagsBits, GuildChannel } from 'discord.js';
-import { ConfigManager } from "../../managers/ConfigManager";
+import { SettingsManager } from "../../managers/SettingsManager";
 
 @autoInjectable()
 export class DisableFindPlayerListener extends Listener {
     public constructor(
         context: Listener.LoaderContext,
         options: Listener.Options,
-        protected configManager: ConfigManager,
+        protected settingsManager: SettingsManager,
     ) {
         super(context, {
             ...options,
@@ -19,8 +19,10 @@ export class DisableFindPlayerListener extends Listener {
 
     public override async run(oldMember: GuildMember, newMember: GuildMember) {
         try {
-            const disableRoleId = this.configManager.getDisableFindPlayerRoleId?.();
-            const findplayerChannelId = this.configManager.getFindplayerChannelId?.();
+            const [disableRoleId, findplayerChannelId] = await Promise.all([
+                this.settingsManager.getDisableFindPlayerRoleId?.(),
+                this.settingsManager.getFindplayerChannelId?.(),
+            ]);
 
             if (!disableRoleId || !findplayerChannelId) return;
 

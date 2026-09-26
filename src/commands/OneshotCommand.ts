@@ -2,7 +2,7 @@ import { Command } from '@sapphire/framework';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { autoInjectable } from 'tsyringe';
 import axios from 'axios';
-import { ConfigManager } from '../managers/ConfigManager';
+import { SettingsManager } from '../managers/SettingsManager';
 import { ApiManager } from '../managers/ApiManager';
 
 @autoInjectable()
@@ -10,7 +10,7 @@ export class OneshotCommand extends Command {
   public constructor(
     context: Command.Context,
     options: Command.Options,
-    protected configManager?: ConfigManager,
+    protected settingsManager?: SettingsManager,
     protected apiManager?: ApiManager,
   ) {
     super(context, { ...options });
@@ -26,11 +26,11 @@ export class OneshotCommand extends Command {
   }
 
   public override async chatInputRun(interaction: ChatInputCommandInteraction) {
-    const guild = await this.configManager!.getGuild();
-    const masterRoleId = this.configManager!.getMasterRoleId();
+    const guild = await this.settingsManager!.getGuild();
+    const masterRoleId = await this.settingsManager!.getMasterRoleId();
     const member = await guild.members.fetch(interaction.user.id);
 
-    if (!member.roles.cache.has(masterRoleId)) {
+    if (!masterRoleId || !member.roles.cache.has(masterRoleId)) {
       await interaction.reply({
         content: 'Non hai i permessi per usare questo comando.',
         ephemeral: true,

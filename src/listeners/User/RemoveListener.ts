@@ -2,14 +2,14 @@ import "reflect-metadata";
 import { autoInjectable } from "tsyringe";
 import { Listener } from '@sapphire/framework';
 import { GuildMember, ChannelType, ForumChannel, EmbedBuilder } from 'discord.js';
-import { ConfigManager } from "../../managers/ConfigManager";
+import { SettingsManager } from "../../managers/SettingsManager";
 
 @autoInjectable()
 export class RemoveListener extends Listener {
   public constructor(
     context: Listener.LoaderContext,
     options: Listener.Options,
-    protected configManager: ConfigManager,
+    protected settingsManager: SettingsManager,
   ) {
     super(context, {
       ...options,
@@ -21,7 +21,7 @@ export class RemoveListener extends Listener {
     // 1) Prova a recuperare l'eventuale presentazione dell'utente (solo canale Forum)
     let presentationUrl: string | null = null;
     try {
-      const presentationsChannelId = (this.configManager as ConfigManager).getPresentationsChannelId?.();
+      const presentationsChannelId = await (this.settingsManager as SettingsManager).getPresentationsChannelId?.();
       if (presentationsChannelId) {
         const presChannel = await member.guild.channels.fetch(presentationsChannelId);
 
@@ -87,7 +87,8 @@ export class RemoveListener extends Listener {
 
   // Invia un embed di avviso quando un utente lascia il server
   private async sendLeaveEmbed(member: GuildMember, presentationUrl?: string) {
-    const channelId = this.configManager.getServerChannelId();
+    const channelId = await this.settingsManager.getServerChannelId();
+    if (!channelId) return;
     const channel = await member.guild.channels.fetch(channelId);
     if (!channel || !channel.isTextBased()) return;
 
@@ -111,7 +112,7 @@ export class RemoveListener extends Listener {
     const avatarUrl = member.user?.displayAvatarURL?.({ forceStatic: false, size: 512 }) ?? undefined;
 
     const embed = new EmbedBuilder()
-      .setColor(this.configManager.getAlertColor())
+      .setColor(await this.settingsManager.getAlertColor())
       .setTitle(title)
       .setDescription(bulletLines.join('\n'));
 

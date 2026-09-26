@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { Listener } from '@sapphire/framework';
 import { EmbedBuilder, Message } from 'discord.js';
 import { autoInjectable } from 'tsyringe';
-import { ConfigManager } from '../../managers/ConfigManager';
+import { SettingsManager } from '../../managers/SettingsManager';
 
 /**
  * PromoGuardListener
@@ -15,7 +15,7 @@ export class PromoGuardListener extends Listener {
   public constructor(
     context: Listener.LoaderContext,
     options: Listener.Options,
-    protected configManager: ConfigManager,
+    protected settingsManager: SettingsManager,
   ) {
     super(context, {
       ...options,
@@ -30,7 +30,7 @@ export class PromoGuardListener extends Listener {
       if (message.author?.bot) return;
 
       // Solo nel canale promo configurato
-      const promoChannelId = this.configManager.getPromoChannelId();
+      const promoChannelId = await this.settingsManager.getPromoChannelId();
       if (!promoChannelId) return;
       if (message.channelId !== promoChannelId) return;
 

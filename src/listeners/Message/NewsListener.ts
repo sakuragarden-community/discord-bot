@@ -2,14 +2,14 @@ import "reflect-metadata";
 import { Listener } from '@sapphire/framework';
 import { Message } from 'discord.js';
 import { autoInjectable } from 'tsyringe';
-import { ConfigManager } from '../../managers/ConfigManager';
+import { SettingsManager } from '../../managers/SettingsManager';
 
 @autoInjectable()
 export class NewsListener extends Listener {
     public constructor(
         context: Listener.LoaderContext,
         options: Listener.Options,
-        protected configManager?: ConfigManager,
+        protected settingsManager?: SettingsManager,
     ) {
         super(context, {
             ...options,
@@ -22,7 +22,7 @@ export class NewsListener extends Listener {
             // Ignora i DM o messaggi senza guild
             if (!message.guild || !message.channelId) return;
 
-            const newsChannelId = this.configManager?.getNewsChannelId();
+            const newsChannelId = await this.settingsManager?.getNewsChannelId();
             if (!newsChannelId) return;
 
             // Solo nel canale news

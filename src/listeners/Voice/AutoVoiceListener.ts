@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { autoInjectable } from "tsyringe";
 import { Listener } from '@sapphire/framework';
 import { ChannelType, GuildBasedChannel, VoiceState } from "discord.js";
-import { ConfigManager } from "../../managers/ConfigManager";
+import { SettingsManager } from "../../managers/SettingsManager";
 
 @autoInjectable()
 export class AutoVoiceListener extends Listener {
@@ -10,7 +10,7 @@ export class AutoVoiceListener extends Listener {
     public constructor(
         context: Listener.LoaderContext,
         options: Listener.Options,
-        protected configManager?: ConfigManager,
+        protected settingsManager?: SettingsManager,
     ) {
         super(context, {
             ...options,
@@ -21,10 +21,12 @@ export class AutoVoiceListener extends Listener {
     public override async run(oldState: VoiceState, newState: VoiceState) {
         try {
             // CREATE: User joined the trigger channel
-            const triggerChannelId = this.configManager?.getVocalTriggerChannelId();
-            const triggerNsfwChannelId = this.configManager?.getNsfwVocalTriggerChannelId();
-            const triggerFocusChannelId = this.configManager?.getFocusVocalTriggerChannelId();
-            const voicesCategoryId = this.configManager?.getVoicesCategoryId();
+            const [triggerChannelId, triggerNsfwChannelId, triggerFocusChannelId, voicesCategoryId] = await Promise.all([
+                this.settingsManager?.getVocalTriggerChannelId(),
+                this.settingsManager?.getNsfwVocalTriggerChannelId(),
+                this.settingsManager?.getFocusVocalTriggerChannelId(),
+                this.settingsManager?.getVoicesCategoryId(),
+            ]);
 
             // When member joins any trigger channel
             const joinedATrigger = (
@@ -40,13 +42,13 @@ export class AutoVoiceListener extends Listener {
 
                 // Decide prefix and user limit based on which trigger was used
                 let prefix = '》☕・Stanza di ';
-                let userLimit = (this.configManager?.getVoiceMaxUsers?.() ?? 10);
+                let userLimit = ((await this.settingsManager?.getVoiceMaxUsers?.()) ?? 10);
 
                 if (triggerNsfwChannelId && newState.channelId === triggerNsfwChannelId) {
                     prefix = '》🔞・Stanza di ';
                 } else if (triggerFocusChannelId && newState.channelId === triggerFocusChannelId) {
                     prefix = '》⚡・Stanza di ';
-                    userLimit = (this.configManager?.getVoiceMaxUsersFocus?.() ?? userLimit);
+                    userLimit = ((await this.settingsManager?.getVoiceMaxUsersFocus?.()) ?? userLimit);
                 }
 
                 // Create the private voice channel under the configured category

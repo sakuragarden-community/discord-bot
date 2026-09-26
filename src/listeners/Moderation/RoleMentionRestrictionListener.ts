@@ -2,14 +2,14 @@ import "reflect-metadata";
 import { autoInjectable } from "tsyringe";
 import { Listener } from '@sapphire/framework';
 import { ChannelType, EmbedBuilder, GuildMember, Message } from 'discord.js';
-import { ConfigManager } from "../../managers/ConfigManager";
+import { SettingsManager } from "../../managers/SettingsManager";
 
 @autoInjectable()
 export class RoleMentionRestrictionListener extends Listener {
   public constructor(
     context: Listener.LoaderContext,
     options: Listener.Options,
-    protected configManager: ConfigManager,
+    protected settingsManager: SettingsManager,
   ) {
     super(context, {
       ...options,
@@ -32,8 +32,8 @@ export class RoleMentionRestrictionListener extends Listener {
       if (!channel || channel.type === ChannelType.DM) return;
       if (!(channel as any).isTextBased?.() || !(channel as any).send) return; // ensure can send
       const parentId = (channel as any).parentId as string | null | undefined;
-      const targetCategoryId = this.configManager.getSearchPlayersCategoryId?.();
-      const findplayerChannelId = this.configManager.getFindplayerChannelId?.();
+      const targetCategoryId = this.settingsManager.getSearchPlayersCategoryId?.();
+      const findplayerChannelId = await this.settingsManager.getFindplayerChannelId?.();
       if (!targetCategoryId || !findplayerChannelId) return;
 
       if (channel.id === findplayerChannelId) return; // exception for findplayer
@@ -52,15 +52,25 @@ export class RoleMentionRestrictionListener extends Listener {
       if (!member) return;
 
       // Prepare role type IDs
+      const [master, admin, moderator, helper, collaborator, supporter, bot, memberRoleId] = await Promise.all([
+        this.settingsManager.getMasterRoleId?.(),
+        this.settingsManager.getAdminRoleId?.(),
+        this.settingsManager.getModeratorRoleId?.(),
+        this.settingsManager.getHelperRoleId?.(),
+        this.settingsManager.getCollaboratorRoleId?.(),
+        this.settingsManager.getSupporterRoleId?.(),
+        this.settingsManager.getBotRoleId?.(),
+        this.settingsManager.getMemberRoleId?.(),
+      ]);
       const roleIds = {
-        master: this.configManager.getMasterRoleId?.(),
-        admin: this.configManager.getAdminRoleId?.(),
-        moderator: this.configManager.getModeratorRoleId?.(),
-        helper: this.configManager.getHelperRoleId?.(),
-        collaborator: this.configManager.getCollaboratorRoleId?.(),
-        supporter: this.configManager.getSupporterRoleId?.(),
-        bot: this.configManager.getBotRoleId?.(),
-        member: this.configManager.getMemberRoleId?.(),
+        master,
+        admin,
+        moderator,
+        helper,
+        collaborator,
+        supporter,
+        bot,
+        member: memberRoleId,
       } as const;
 
       // Collect member's roles that are part of the defined role types
@@ -84,7 +94,7 @@ export class RoleMentionRestrictionListener extends Listener {
       // Send warning embed tagging the user outside the embed
       try {
         const embed = new EmbedBuilder()
-          .setColor(this.configManager.getErrorColor())
+          .setColor(await this.settingsManager.getErrorColor())
           .setTitle('⛔ Per cercare giocatori usa il canale dedicato')
           .setDescription(`Per favore utilizza il canale <#${findplayerChannelId}> per cercare o menzionare ruoli di gioco. Grazie!`);
 
