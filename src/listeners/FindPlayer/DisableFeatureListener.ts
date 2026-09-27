@@ -28,8 +28,8 @@ export class DisableFindPlayerListener extends Listener {
     /** Nega o ripristina la visualizzazione del canale findplayer in base all'aggiunta/rimozione del ruolo disableFindPlayer. */
     protected async updateFindPlayerPermissions(oldMember: GuildMember, newMember: GuildMember) {
         const [disableRoleId, findplayerChannelId] = await Promise.all([
-            this.settingsManager.getDisableFindPlayerRoleId?.(),
-            this.settingsManager.getFindplayerChannelId?.(),
+            this.settingsManager.getDisableFindGroupRoleId?.(),
+            this.settingsManager.getFindGroupChannelId?.(),
         ]);
 
         if (!disableRoleId || !findplayerChannelId) return;
