@@ -5,7 +5,7 @@ import { autoInjectable } from 'tsyringe';
 import { SettingsManager } from '../../managers/SettingsManager';
 
 @autoInjectable()
-export class NewsListener extends Listener {
+export class NewsReactionListener extends Listener {
     public constructor(
         context: Listener.LoaderContext,
         options: Listener.Options,
@@ -37,7 +37,7 @@ export class NewsListener extends Listener {
             await message.react('🌸');
         } catch (e) {
             // Non bloccare il bot per errori inattesi
-            console.error('NewsListener error:', e);
+            console.error('NewsReactionListener error:', e);
         }
     }
 }

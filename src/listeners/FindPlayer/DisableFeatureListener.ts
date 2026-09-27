@@ -5,7 +5,7 @@ import { GuildMember, PermissionFlagsBits, GuildChannel } from 'discord.js';
 import { SettingsManager } from "../../managers/SettingsManager";
 
 @autoInjectable()
-export class DisableFindPlayerListener extends Listener {
+export class DisableFeatureListener extends Listener {
     public constructor(
         context: Listener.LoaderContext,
         options: Listener.Options,
@@ -62,7 +62,7 @@ export class DisableFindPlayerListener extends Listener {
                 return;
             }
         } catch (error) {
-            console.error('Errore in DisableFindPlayerListener:', error);
+            console.error('Errore in DisableFeatureListener:', error);
         }
     }
 }

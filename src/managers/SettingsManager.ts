@@ -301,18 +301,4 @@ export class SettingsManager {
         const violet = (await this.getSetting("general/colors/violet")) ?? "#EE82EE";
         return violet as ColorResolvable;
     }
-
-    // Categoria testuale dove è vietato menzionare ruoli (eccetto canale findplayer)
-    // ID fornito nella specifica: 1304844728730386462
-    public getSearchPlayersCategoryId(): string
-    {
-        return "1304844728730386462";
-    }
-
-    // Utente esente dalla cancellazione dei messaggi in #findplayer
-    public getFindplayerExemptUserId(): string
-    {
-        // ID fornito nella specifica
-        return "1349839010490617918";
-    }
 }
