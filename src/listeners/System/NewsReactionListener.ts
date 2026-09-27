@@ -19,25 +19,30 @@ export class NewsReactionListener extends Listener {
 
     public override async run(message: Message) {
         try {
-            // Ignora i DM o messaggi senza guild
-            if (!message.guild || !message.channelId) return;
-
-            const newsChannelId = await this.settingsManager?.getNewsChannelId();
-            if (!newsChannelId) return;
-
-            // Solo nel canale news
-            if (message.channelId !== newsChannelId) return;
-
-            // Se il messaggio è parziale, prova a fetcharlo prima di reagire
-            if (message.partial) {
-                try { await message.fetch(); } catch { /* ignore fetch errors */ }
-            }
-
-            // Aggiunge la reazione 🌸
-            await message.react('🌸');
+            await this.reactToNews(message);
         } catch (e) {
             // Non bloccare il bot per errori inattesi
             console.error('NewsReactionListener error:', e);
         }
+    }
+
+    /** Aggiunge la reazione 🌸 ai messaggi pubblicati nel canale news. */
+    protected async reactToNews(message: Message) {
+        // Ignora i DM o messaggi senza guild
+        if (!message.guild || !message.channelId) return;
+
+        const newsChannelId = await this.settingsManager?.getNewsChannelId();
+        if (!newsChannelId) return;
+
+        // Solo nel canale news
+        if (message.channelId !== newsChannelId) return;
+
+        // Se il messaggio è parziale, prova a fetcharlo prima di reagire
+        if (message.partial) {
+            try { await message.fetch(); } catch { /* ignore fetch errors */ }
+        }
+
+        // Aggiunge la reazione 🌸
+        await message.react('🌸');
     }
 }

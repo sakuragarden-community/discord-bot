@@ -1,123 +1,87 @@
 import "reflect-metadata";
 import { autoInjectable } from "tsyringe";
 import { Listener } from '@sapphire/framework';
-import { GuildMember, ChannelType, ForumChannel, EmbedBuilder } from 'discord.js';
+import { GuildMember, PartialGuildMember } from 'discord.js';
 import { SettingsManager } from "../../managers/SettingsManager";
+import { Member, MemberManager, MemberStatus } from "../../managers/MemberManager";
+import { buildMemberNotificationEmbed } from "../../utils/MemberNotificationEmbed";
 
 @autoInjectable()
 export class RemoveListener extends Listener {
-  public constructor(
-    context: Listener.LoaderContext,
-    options: Listener.Options,
-    protected settingsManager: SettingsManager,
-  ) {
-    super(context, {
-      ...options,
-      event: 'guildMemberRemove'
-    });
-  }
 
-  public override async run(member: GuildMember) {
-    // 1) Prova a recuperare l'eventuale presentazione dell'utente (solo canale Forum)
-    let presentationUrl: string | null = null;
-    try {
-      const presentationsChannelId = await (this.settingsManager as SettingsManager).getPresentationsChannelId?.();
-      if (presentationsChannelId) {
-        const presChannel = await member.guild.channels.fetch(presentationsChannelId);
+    public constructor(
+        context: Listener.LoaderContext,
+        options: Listener.Options,
+        protected settingsManager: SettingsManager,
+        protected memberManager: MemberManager,
+    ) {
+        super(context, {
+            ...options,
+            event: 'guildMemberRemove'
+        });
+    }
 
-        if (!presChannel) {
-          console.warn('Canale presentazioni non trovato.');
-        } else if (presChannel.type === ChannelType.GuildForum) {
-          // Gestione Forum: i post sono thread
-          const forum = presChannel as ForumChannel;
-          try {
-            // Thread attivi
-            const active = await forum.threads.fetchActive();
-            const toCheckActive = Array.from(active.threads.values());
+    public override async run(member: GuildMember | PartialGuildMember) {
+        const banned = await this.isBanned(member);
 
-            // Thread archiviati pubblici (i forum usano thread pubblici)
-            const archived = await forum.threads.fetchArchived({ type: 'public', limit: 100 });
-            const toCheckArchived = Array.from(archived.threads.values());
-
-            const toCheck = [...toCheckActive, ...toCheckArchived];
-
-            for (const thread of toCheck) {
-              try {
-                // Verifica proprietario o autore del primo messaggio
-                const isOwner = (thread as any).ownerId === member.id;
-                let isStarterAuthor = false;
-                try {
-                  const starter = await (thread as any).fetchStarterMessage?.();
-                  if (starter) {
-                    isStarterAuthor = starter.author?.id === member.id;
-                  }
-                } catch {}
-
-                if (isOwner || isStarterAuthor) {
-                  // Memorizza l'URL del thread (se non già trovato)
-                  if (!presentationUrl) {
-                    try {
-                      presentationUrl = (thread as any)?.url ?? `https://discord.com/channels/${member.guild.id}/${thread.id}`;
-                    } catch {}
-                  }
-                  // Non cancellare la presentazione: si conserva solo l'URL
-                  break;
-                }
-              } catch (e) {
-                console.warn(`Errore durante l'analisi del thread ${thread.id} per l'utente ${member.id}:`, e);
-              }
-            }
-
-          } catch (e) {
-            console.error('Errore durante la gestione dei thread del forum di presentazioni:', e);
-          }
+        let record: Member | null = null;
+        try {
+            record = await this.saveMemberExit(member, banned ? "BANNED" : "LEFT");
+        } catch (error) {
+            console.error("Errore durante l'aggiornamento del membro in uscita sulle API Kodama:", error);
         }
-      }
-    } catch (error) {
-      console.error('Errore durante la gestione delle presentazioni in uscita:', error);
+
+        try {
+            await this.notifyStaff(member, record, banned);
+        } catch (error) {
+            console.error("Errore durante l'invio della notifica di uscita allo Staff:", error);
+        }
     }
 
-    // 2) Invia un messaggio nel canale server che l'utente è uscito
-    try {
-      await this.sendLeaveEmbed(member, presentationUrl ?? undefined);
-    } catch (error) {
-      console.error('Errore durante l\'invio dell\'avviso di uscita utente:', error);
-    }
-  }
-
-  // Invia un embed di avviso quando un utente lascia il server
-  private async sendLeaveEmbed(member: GuildMember, presentationUrl?: string) {
-    const channelId = await this.settingsManager.getServerChannelId();
-    if (!channelId) return;
-    const channel = await member.guild.channels.fetch(channelId);
-    if (!channel || !channel.isTextBased()) return;
-
-    const username = member.user?.tag ?? member.displayName ?? 'Utente sconosciuto';
-    const title = `👋 L'utente ${username} ha lasciato il server.`; // stesso testo della riga 86
-
-    const joinedAt = member.joinedAt ? new Date(member.joinedAt) : null;
-    const leftAt = new Date();
-
-    const formatDateTime = (d: Date | null) => d ? d.toLocaleString('it-IT') : 'N/D';
-
-    const bulletLines: string[] = [
-      `• Data di ingresso: ${formatDateTime(joinedAt)}`,
-      `• Data di uscita: ${formatDateTime(leftAt)}`,
-    ];
-
-    if (presentationUrl) {
-      bulletLines.push(`• Presentazione: ${presentationUrl}`);
+    /** `true` se l'uscita è dovuta a un ban (richiede il permesso "Banna membri"). */
+    protected async isBanned(member: GuildMember | PartialGuildMember): Promise<boolean> {
+        try {
+            await member.guild.bans.fetch({ user: member.id, force: true });
+            return true;
+        } catch {
+            return false;
+        }
     }
 
-    const avatarUrl = member.user?.displayAvatarURL?.({ forceStatic: false, size: 512 }) ?? undefined;
+    /** Aggiorna sulle API Kodama lo stato del membro e la data di uscita. */
+    protected async saveMemberExit(member: GuildMember | PartialGuildMember, status: MemberStatus): Promise<Member | null> {
+        const existing = await this.memberManager.findByDiscordId(member.id);
+        if (!existing) {
+            console.warn(`Membro ${member.id} non registrato sulle API Kodama: uscita non salvata.`);
+            return null;
+        }
 
-    const embed = new EmbedBuilder()
-      .setColor(await this.settingsManager.getAlertColor())
-      .setTitle(title)
-      .setDescription(bulletLines.join('\n'));
+        return this.memberManager.patch(existing.id, {
+            status,
+            leftAt: new Date().toISOString(),
+        });
+    }
 
-    if (avatarUrl) embed.setThumbnail(avatarUrl);
+    /** Notifica allo Staff, nel canale server, l'uscita o il ban del membro. */
+    protected async notifyStaff(member: GuildMember | PartialGuildMember, record: Member | null, banned: boolean) {
+        const channelId = await this.settingsManager.getServerChannelId();
+        if (!channelId) return;
+        const channel = await member.guild.channels.fetch(channelId);
+        if (!channel || !channel.isTextBased()) return;
 
-    await channel.send({ embeds: [embed] });
-  }
+        const username = record?.username ?? member.user.username;
+        const embed = buildMemberNotificationEmbed({
+            user: member.user,
+            member: record,
+            title: banned ? '🔨 Un fiore è stato estirpato' : '🍂 Un fiore ha lasciato il giardino',
+            description: banned
+                ? `**${username}** è stato bannato dal server.`
+                : `**${username}** è appena uscito dal server. Alla prossima! 👋`,
+            color: banned
+                ? await this.settingsManager.getErrorColor()
+                : await this.settingsManager.getAlertColor(),
+        });
+
+        await channel.send({ embeds: [embed] });
+    }
 }

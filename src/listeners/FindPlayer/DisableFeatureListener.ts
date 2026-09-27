@@ -19,50 +19,55 @@ export class DisableFindPlayerListener extends Listener {
 
     public override async run(oldMember: GuildMember, newMember: GuildMember) {
         try {
-            const [disableRoleId, findplayerChannelId] = await Promise.all([
-                this.settingsManager.getDisableFindPlayerRoleId?.(),
-                this.settingsManager.getFindplayerChannelId?.(),
-            ]);
-
-            if (!disableRoleId || !findplayerChannelId) return;
-
-            const hadRole = oldMember.roles.cache.has(disableRoleId);
-            const hasRole = newMember.roles.cache.has(disableRoleId);
-
-            if (hadRole === hasRole) return; // Nessun cambiamento sul ruolo target
-
-            const channel = await newMember.guild.channels.fetch(findplayerChannelId);
-            if (!channel) return;
-
-            const reason = 'Aggiornamento permessi findplayer per ruolo disableFindPlayer';
-
-            // Se il ruolo è stato AGGIUNTO => nega la visualizzazione del canale all'utente
-            if (!hadRole && hasRole) {
-                try {
-                    if ((channel as GuildChannel).permissionOverwrites) {
-                        await (channel as GuildChannel).permissionOverwrites.edit(newMember.id, {
-                            ViewChannel: false
-                        }, { reason });
-                    }
-                } catch (e) {
-                    console.error('Errore durante l\'aggiunta del deny ViewChannel per utente', newMember.id, 'nel canale', findplayerChannelId, e);
-                }
-                return;
-            }
-
-            // Se il ruolo è stato RIMOSSO => rimuovi l\'overwrite specifico dell'utente
-            if (hadRole && !hasRole) {
-                try {
-                    if ((channel as GuildChannel).permissionOverwrites) {
-                        await (channel as GuildChannel).permissionOverwrites.delete(newMember.id, reason);
-                    }
-                } catch (e) {
-                    console.error('Errore durante la rimozione dell\'overwrite per utente', newMember.id, 'nel canale', findplayerChannelId, e);
-                }
-                return;
-            }
+            await this.updateFindPlayerPermissions(oldMember, newMember);
         } catch (error) {
             console.error('Errore in DisableFeatureListener:', error);
+        }
+    }
+
+    /** Nega o ripristina la visualizzazione del canale findplayer in base all'aggiunta/rimozione del ruolo disableFindPlayer. */
+    protected async updateFindPlayerPermissions(oldMember: GuildMember, newMember: GuildMember) {
+        const [disableRoleId, findplayerChannelId] = await Promise.all([
+            this.settingsManager.getDisableFindPlayerRoleId?.(),
+            this.settingsManager.getFindplayerChannelId?.(),
+        ]);
+
+        if (!disableRoleId || !findplayerChannelId) return;
+
+        const hadRole = oldMember.roles.cache.has(disableRoleId);
+        const hasRole = newMember.roles.cache.has(disableRoleId);
+
+        if (hadRole === hasRole) return; // Nessun cambiamento sul ruolo target
+
+        const channel = await newMember.guild.channels.fetch(findplayerChannelId);
+        if (!channel) return;
+
+        const reason = 'Aggiornamento permessi findplayer per ruolo disableFindPlayer';
+
+        // Se il ruolo è stato AGGIUNTO => nega la visualizzazione del canale all'utente
+        if (!hadRole && hasRole) {
+            try {
+                if ((channel as GuildChannel).permissionOverwrites) {
+                    await (channel as GuildChannel).permissionOverwrites.edit(newMember.id, {
+                        ViewChannel: false
+                    }, { reason });
+                }
+            } catch (e) {
+                console.error('Errore durante l\'aggiunta del deny ViewChannel per utente', newMember.id, 'nel canale', findplayerChannelId, e);
+            }
+            return;
+        }
+
+        // Se il ruolo è stato RIMOSSO => rimuovi l\'overwrite specifico dell'utente
+        if (hadRole && !hasRole) {
+            try {
+                if ((channel as GuildChannel).permissionOverwrites) {
+                    await (channel as GuildChannel).permissionOverwrites.delete(newMember.id, reason);
+                }
+            } catch (e) {
+                console.error('Errore durante la rimozione dell\'overwrite per utente', newMember.id, 'nel canale', findplayerChannelId, e);
+            }
+            return;
         }
     }
 }
