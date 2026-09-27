@@ -5,7 +5,7 @@ import { GuildMember, PermissionFlagsBits, GuildChannel } from 'discord.js';
 import { SettingsManager } from "../../managers/SettingsManager";
 
 @autoInjectable()
-export class DisableFeatureListener extends Listener {
+export class DisableFindPlayerListener extends Listener {
     public constructor(
         context: Listener.LoaderContext,
         options: Listener.Options,
