@@ -50,7 +50,7 @@ export class SeedCommand extends Command {
                         .setRequired(true)
                         .addChoices({ name: 'member', value: 'member' }),
                 ),
-            { idHints: ['1553763465565577249'] },
+            { idHints: ['1554191775831302154'] },
         );
     }
 

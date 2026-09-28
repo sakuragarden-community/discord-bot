@@ -104,6 +104,7 @@ export class SetupCommand extends Command {
                         .setRequired(false)
                         .setAutocomplete(true),
                 ),
+            { idHints: ['1554191774094860328'] },
         );
     }
 
