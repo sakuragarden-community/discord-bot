@@ -367,9 +367,23 @@
         "type": "embed",
         "embedColor": "primary",
         "embedTitle": "❓ Come funzionano i canali vocali di Sakura Garden?",
-        "content": "voices/guide.md",
+        "content": "community/createvoice.md",
         "image": "",
         "buttons": []
+      },
+      {
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "",
+        "buttons": [
+          {
+            "type": "modal",
+            "id": "create-voice-modal-button",
+            "label": "Clicca qui per creare la tua vocale"
+          }
+        ]
       }
     ]
   }

@@ -132,6 +132,11 @@ export class SettingsManager {
         return this.getSetting("channels/community/find_group");
     }
 
+    public async getVoicesCategoryId()
+    {
+        return this.getSetting("voice/general/category_id");
+    }
+
     // Ritorna il colore primario definito nelle configurazioni
     public async getPrimaryColor(): Promise<ColorResolvable>
     {

@@ -1,0 +1,5 @@
+🔊 Premi il pulsante qui sotto per **creare la tua stanza vocale**, scegliendone il tipo e il numero massimo di persone. **La stanza viene eliminata non appena si svuota**, e non puoi crearne un'altra finché ne hai una ancora vuota.
+
+- ☕ **Chill**: per chiacchierare in un clima tranquillo. **Si applica la [3° Regola Fondamentale](https://discord.com/channels/1302653623360294942/1430835175654166558/1467107967554814049).**
+- 🔞 **18+**: per chi non ha problemi con un linguaggio più colorito. **Non si applica la [3° Regola Fondamentale](https://discord.com/channels/1302653623360294942/1430835175654166558/1467107967554814049).**
+- ⚡ **Focus**: per attività che richiedono concentrazione, come una partita classificata o un progetto artistico. **Non disturbare i partecipanti**; la [3° Regola Fondamentale](https://discord.com/channels/1302653623360294942/1430835175654166558/1467107967554814049) è a discrezione di chi crea la stanza.
