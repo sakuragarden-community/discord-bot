@@ -5,7 +5,7 @@ import { GuildMember, PermissionFlagsBits, GuildChannel } from 'discord.js';
 import { SettingsManager } from "../../managers/SettingsManager";
 
 @autoInjectable()
-export class DisableFindPlayerListener extends Listener {
+export class DisableFeatureListener extends Listener {
     public constructor(
         context: Listener.LoaderContext,
         options: Listener.Options,
@@ -19,30 +19,30 @@ export class DisableFindPlayerListener extends Listener {
 
     public override async run(oldMember: GuildMember, newMember: GuildMember) {
         try {
-            await this.updateFindPlayerPermissions(oldMember, newMember);
+            await this.updateFindGroupPermissions(oldMember, newMember);
         } catch (error) {
             console.error('Errore in DisableFeatureListener:', error);
         }
     }
 
-    /** Nega o ripristina la visualizzazione del canale findplayer in base all'aggiunta/rimozione del ruolo disableFindPlayer. */
-    protected async updateFindPlayerPermissions(oldMember: GuildMember, newMember: GuildMember) {
-        const [disableRoleId, findplayerChannelId] = await Promise.all([
+    /** Nega o ripristina la visualizzazione del canale findgroup in base all'aggiunta/rimozione del ruolo disableFindGroup. */
+    protected async updateFindGroupPermissions(oldMember: GuildMember, newMember: GuildMember) {
+        const [disableRoleId, findGroupChannelId] = await Promise.all([
             this.settingsManager.getDisableFindGroupRoleId?.(),
             this.settingsManager.getFindGroupChannelId?.(),
         ]);
 
-        if (!disableRoleId || !findplayerChannelId) return;
+        if (!disableRoleId || !findGroupChannelId) return;
 
         const hadRole = oldMember.roles.cache.has(disableRoleId);
         const hasRole = newMember.roles.cache.has(disableRoleId);
 
         if (hadRole === hasRole) return; // Nessun cambiamento sul ruolo target
 
-        const channel = await newMember.guild.channels.fetch(findplayerChannelId);
+        const channel = await newMember.guild.channels.fetch(findGroupChannelId);
         if (!channel) return;
 
-        const reason = 'Aggiornamento permessi findplayer per ruolo disableFindPlayer';
+        const reason = 'Aggiornamento permessi findgroup per ruolo disableFindGroup';
 
         // Se il ruolo è stato AGGIUNTO => nega la visualizzazione del canale all'utente
         if (!hadRole && hasRole) {
@@ -53,7 +53,7 @@ export class DisableFindPlayerListener extends Listener {
                     }, { reason });
                 }
             } catch (e) {
-                console.error('Errore durante l\'aggiunta del deny ViewChannel per utente', newMember.id, 'nel canale', findplayerChannelId, e);
+                console.error('Errore durante l\'aggiunta del deny ViewChannel per utente', newMember.id, 'nel canale', findGroupChannelId, e);
             }
             return;
         }
@@ -65,7 +65,7 @@ export class DisableFindPlayerListener extends Listener {
                     await (channel as GuildChannel).permissionOverwrites.delete(newMember.id, reason);
                 }
             } catch (e) {
-                console.error('Errore durante la rimozione dell\'overwrite per utente', newMember.id, 'nel canale', findplayerChannelId, e);
+                console.error('Errore durante la rimozione dell\'overwrite per utente', newMember.id, 'nel canale', findGroupChannelId, e);
             }
             return;
         }

@@ -322,17 +322,31 @@
       },
       {
         "type": "embed",
-        "embedColor": "violet",
-        "embedTitle": "Trova nuovi amici con gui giocare! ✨",
-        "content": "videogames/findplayer.md",
+        "embedColor": "primary",
+        "embedTitle": "Trova nuovi amici con cui fare gruppo! ✨",
+        "content": "community/findgroup.md",
         "image": "",
         "buttons": []
       },
       {
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "",
+        "buttons": [
+          {
+            "type": "modal",
+            "id": "lfg-modal-button",
+            "label": "Clicca qui per creare un annuncio"
+          }
+        ]
+      },
+      {
         "type": "embed",
         "embedColor": "alert",
-        "embedTitle": "Non vuoi ricevere le notifiche o non ti interessa la funzione di ricerca?",
-        "content": "videogames/disablefindplayer.md",
+        "embedTitle": "Non ti interessa la funzione Cerca Gruppo?",
+        "content": "community/disablefindgroup.md",
         "image": "",
         "buttons": []
       }

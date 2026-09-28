@@ -24,12 +24,23 @@ import { SettingsManager } from '../../managers/SettingsManager';
 const MESSAGES_FILE = 'setup/messages.json';
 const CONTENT_DIR = 'setup/content';
 
-/** Pulsante da inserire come interactive component del messaggio. */
-interface SetupButton {
+/** Pulsante che apre un link esterno. */
+interface SetupLinkButton {
     type: 'link';
     label: string;
     url: string;
 }
+
+/** Pulsante che apre una modale, gestita dall'interaction handler associato all'ID. */
+interface SetupModalButton {
+    type: 'modal';
+    /** Custom ID assegnato al pulsante. */
+    id: string;
+    label: string;
+}
+
+/** Pulsante da inserire come interactive component del messaggio. */
+type SetupButton = SetupLinkButton | SetupModalButton;
 
 /** Definizione di un messaggio da pubblicare. */
 interface SetupMessage {
@@ -271,6 +282,17 @@ export class SetupCommand extends Command {
                                 .setStyle(ButtonStyle.Link)
                                 .setLabel(button.label)
                                 .setURL(button.url),
+                        );
+                        break;
+                    case 'modal':
+                        if (!button.id) {
+                            throw new Error(`il pulsante "${button.label}" di tipo modal non ha un id`);
+                        }
+                        row.addComponents(
+                            new ButtonBuilder()
+                                .setStyle(ButtonStyle.Primary)
+                                .setLabel(button.label)
+                                .setCustomId(button.id),
                         );
                         break;
                     default:
