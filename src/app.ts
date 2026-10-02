@@ -11,7 +11,6 @@ const client = new SapphireClient({
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.DirectMessages,
-        GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildMessageReactions,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildScheduledEvents,
@@ -30,9 +29,3 @@ const client = new SapphireClient({
 dotenv.config();
 
 client.login(process.env.TOKEN);
-
-if (process.env.MODE === 'staging') {
-    client.login(process.env.TOKEN_STAGING);
-} else {
-
-}
