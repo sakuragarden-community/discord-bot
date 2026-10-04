@@ -1,0 +1,20 @@
+services:
+  bot:
+    image: ghcr.io/sakuragarden-community/discord-bot:${BOT_TAG:?BOT_TAG mancante nel .env}
+    restart: unless-stopped
+    init: true
+    env_file: .env
+    environment:
+      TZ: Europe/Rome
+      # Kodama API raggiunta sulla rete condivisa, senza passare da Internet
+      KODAMA_API_BASE_URL: http://kodama-api:8080
+    networks: [kodama-nest]
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  kodama-nest:
+    external: true

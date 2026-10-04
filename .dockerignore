@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.git/
+.github/
+.idea/
+.env
+config.json
+z-doc/
+docs/
+deploy.sh
+docker-compose*.yml
+Dockerfile
