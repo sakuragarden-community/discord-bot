@@ -64,7 +64,7 @@ export class RemoveListener extends Listener {
 
     /** Notifica allo Staff, nel canale server, l'uscita o il ban del membro. */
     protected async notifyStaff(member: GuildMember | PartialGuildMember, record: Member | null, banned: boolean) {
-        const channelId = await this.settingsManager.getServerChannelId();
+        const channelId = await this.settingsManager.getNewChannelId();
         if (!channelId) return;
         const channel = await member.guild.channels.fetch(channelId);
         if (!channel || !channel.isTextBased()) return;

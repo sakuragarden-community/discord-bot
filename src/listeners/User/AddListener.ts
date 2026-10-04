@@ -96,7 +96,7 @@ export class AddListener extends Listener {
 
     /** Notifica allo Staff, nel canale server, l'ingresso del membro. */
     protected async notifyStaff(member: GuildMember, record: Member | null, returning: boolean) {
-        const channelId = await this.settingsManager.getServerChannelId();
+        const channelId = await this.settingsManager.getNewChannelId();
         if (!channelId) return;
         const channel = await member.guild.channels.fetch(channelId);
         if (!channel || !channel.isTextBased()) return;

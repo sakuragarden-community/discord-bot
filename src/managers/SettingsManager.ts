@@ -174,4 +174,9 @@ export class SettingsManager {
         const violet = (await this.getSetting("general/colors/violet")) ?? "#EE82EE";
         return violet as ColorResolvable;
     }
+
+    public async getNewChannelId()
+    {
+        return this.getSetting("channels/community/new");
+    }
 }
