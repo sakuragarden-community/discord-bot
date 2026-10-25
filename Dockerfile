@@ -3,7 +3,7 @@
 # --- Dipendenze ---
 # Immagine completa: include python3, make e g++ nel caso un modulo nativo
 # (es. sqlite3) non trovi un binario precompilato e vada compilato.
-FROM node:22-bookworm AS deps
+FROM node:24.22.1-bookworm AS deps
 WORKDIR /app
 
 COPY package.json package-lock.json ./

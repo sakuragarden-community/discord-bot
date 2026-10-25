@@ -1,6 +1,6 @@
 services:
   discord-bot:
-    image: node:22-bookworm
+    image: node:24.22.1-bookworm
     container_name: kodama-discord-bot-dev
     restart: unless-stopped
     init: true
