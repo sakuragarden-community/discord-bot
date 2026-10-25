@@ -24,5 +24,8 @@
   "devDependencies": {
     "typescript": "^5.5.3"
   },
-  "private": true
+  "private": true,
+  "allowScripts": {
+    "sqlite3@6.0.1": true
+  }
 }
