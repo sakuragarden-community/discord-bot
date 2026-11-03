@@ -18,9 +18,9 @@ import {
     LFG_GAME_INPUT_ID,
     LFG_GAMES,
     LFG_GAMES_REASON,
-    LFG_MODAL_ID,
-    LFG_REASON_INPUT_ID,
-    LFG_REASONS,
+    LFG_MODAL_PREFIX,
+    LfgReason,
+    parseLfgReason,
 } from '../../utils/FindGroup';
 
 /** Lunghezza massima del nome di un thread consentita da Discord. */
@@ -52,17 +52,18 @@ export class LfgModalSubmitHandler extends InteractionHandler {
     }
 
     public override parse(interaction: ModalSubmitInteraction) {
-        return interaction.customId === LFG_MODAL_ID ? this.some() : this.none();
+        const reason = parseLfgReason(interaction.customId, LFG_MODAL_PREFIX);
+        return reason ? this.some(reason) : this.none();
     }
 
-    public override async run(interaction: ModalSubmitInteraction) {
+    public override async run(interaction: ModalSubmitInteraction, reason: LfgReason) {
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
         try {
-            const announcement = this.readAnnouncement(interaction);
+            const announcement = this.readAnnouncement(interaction, reason);
             if (!announcement) {
                 await interaction.editReply(
-                    '❌ L\'annuncio non è stato creato perché stai cercando giocatori ma non hai selezionato nessun titolo di gioco. '
+                    '❌ L\'annuncio non è stato creato perché non hai selezionato nessun titolo di gioco. '
                     + 'Riprova scegliendo il gioco per cui cerchi persone.',
                 );
                 return;
@@ -70,6 +71,8 @@ export class LfgModalSubmitHandler extends InteractionHandler {
 
             const channel = await fetchFindGroupChannel(this.settingsManager!);
             const author = interaction.user;
+            // Nome mostrato nel server (soprannome, altrimenti nome visualizzato o username)
+            const authorName = interaction.inCachedGuild() ? interaction.member.displayName : author.displayName;
 
             // Verifica ripetuta all'invio: la modale potrebbe essere stata aperta più volte prima di pubblicare
             const activeAnnouncement = await findActiveAnnouncement(channel, author.id);
@@ -80,13 +83,17 @@ export class LfgModalSubmitHandler extends InteractionHandler {
 
             const message = await channel.send({
                 content: `${author} ha creato un nuovo annuncio per ${roleMention(announcement.roleId)}!`,
-                embeds: [await this.buildEmbed(author, announcement)],
+                embeds: [await this.buildEmbed(author, authorName, announcement)],
                 allowedMentions: { users: [author.id], roles: [announcement.roleId] },
             });
 
+            // Una reaction mancata non invalida l'annuncio, già pubblicato
+            await message.react('✅').catch((error) =>
+                console.error('[LfgModalSubmitHandler] Errore durante l\'aggiunta della reaction:', error));
+
             // Il thread nasce dal messaggio dell'annuncio, così la pulizia periodica può rimuoverli insieme
             const thread = await message.startThread({
-                name: this.buildThreadName(author, announcement),
+                name: this.buildThreadName(authorName, announcement),
                 autoArchiveDuration: ThreadAutoArchiveDuration.OneDay,
             });
 
@@ -98,46 +105,32 @@ export class LfgModalSubmitHandler extends InteractionHandler {
     }
 
     /** Legge i dati della modale; ritorna `null` se si cercano giocatori senza aver scelto un gioco. */
-    protected readAnnouncement(interaction: ModalSubmitInteraction): LfgAnnouncement | null {
-        const [reasonValue] = interaction.fields.getStringSelectValues(LFG_REASON_INPUT_ID);
-        const [gameValue] = interaction.fields.getStringSelectValues(LFG_GAME_INPUT_ID);
-
-        const reason = LFG_REASONS.find(({ value }) => value === reasonValue);
-        if (!reason) {
-            throw new Error(`motivo "${reasonValue}" non valido`);
-        }
-
+    protected readAnnouncement(interaction: ModalSubmitInteraction, reason: LfgReason): LfgAnnouncement | null {
         const description = interaction.fields.getTextInputValue(LFG_DESCRIPTION_INPUT_ID).trim();
 
-        // Il gioco è rilevante solo se si cercano giocatori, e in quel caso è obbligatorio
+        // Il gioco è presente solo nella modale di chi cerca giocatori, e in quel caso è obbligatorio
         if (reason.value !== LFG_GAMES_REASON) {
             return { reason: reason.label, game: null, roleId: reason.topic!, description };
         }
 
+        const [gameValue] = interaction.fields.getStringSelectValues(LFG_GAME_INPUT_ID);
         const game = LFG_GAMES.find(({ value }) => value === gameValue && value !== 'none');
         if (!game) return null;
 
         return { reason: reason.label, game: game.label, roleId: game.role!, description };
     }
 
-    protected async buildEmbed(author: User, announcement: LfgAnnouncement): Promise<EmbedBuilder> {
-        const embed = new EmbedBuilder()
+    /** L'embed riporta solo autore e descrizione: ruolo e thread sono già nel messaggio. */
+    protected async buildEmbed(author: User, authorName: string, announcement: LfgAnnouncement): Promise<EmbedBuilder> {
+        return new EmbedBuilder()
             .setColor(await this.settingsManager!.getPrimaryColor())
-            .setTitle(`Annuncio di ${author.username}`)
+            .setTitle(`Annuncio di ${authorName}`)
             .setThumbnail(author.displayAvatarURL({ size: 256 }))
-            .addFields({ name: 'Motivo', value: announcement.reason });
-
-        if (announcement.game) {
-            embed.addFields({ name: 'Gioco', value: announcement.game });
-        }
-
-        return embed
-            .addFields({ name: 'Descrizione', value: announcement.description })
-            .setTimestamp();
+            .setDescription(announcement.description);
     }
 
-    protected buildThreadName(author: User, announcement: LfgAnnouncement): string {
-        const parts = [`Annuncio di ${author.username}`, announcement.reason];
+    protected buildThreadName(authorName: string, announcement: LfgAnnouncement): string {
+        const parts = [`Annuncio di ${authorName}`, announcement.reason];
         if (announcement.game) parts.push(announcement.game);
 
         const name = parts.join(' - ');

@@ -1,4 +1,4 @@
-import { ChannelType, Guild, GuildBasedChannel, VoiceChannel } from 'discord.js';
+import { ChannelType, Guild, GuildBasedChannel, OverwriteType, VoiceChannel } from 'discord.js';
 import { SettingsManager } from '../managers/SettingsManager';
 
 /** Custom ID del pulsante pubblicato nel canale createVoice (vedi setup/messages.json). */
@@ -23,9 +23,9 @@ export const VOICE_TYPES = [
 
 export type VoiceType = typeof VOICE_TYPES[number];
 
-/** Nome della stanza, nel formato `》<emoji>・Stanza di <username>`. */
-export function buildVoiceRoomName(type: VoiceType, username: string): string {
-    return `》${type.emoji}・Stanza di ${username}`;
+/** Nome della stanza, nel formato `》<emoji>・Stanza di <nome nel server>`. */
+export function buildVoiceRoomName(type: VoiceType, displayName: string): string {
+    return `》${type.emoji}・Stanza di ${displayName}`;
 }
 
 /** Recupera l'ID della categoria delle vocali dalla configurazione `voice/general/category_id`. */
@@ -44,13 +44,15 @@ export function isVoiceRoom(channel: GuildBasedChannel, categoryId: string): cha
         && VOICE_TYPES.some((type) => channel.name.startsWith(`》${type.emoji}・Stanza di `));
 }
 
-/** Stanze vuote dell'utente: l'utente è identificato dallo username nel nome, univoco su Discord. */
-export function findEmptyVoiceRooms(guild: Guild, categoryId: string, username: string): VoiceChannel[] {
-    const names = VOICE_TYPES.map((type) => buildVoiceRoomName(type, username));
+/**
+ * Stanze vuote dell'utente: il nome nel server non è univoco e può cambiare, quindi il creatore è identificato
+ * dall'overwrite dei permessi a lui intestato al momento della creazione.
+ */
+export function findEmptyVoiceRooms(guild: Guild, categoryId: string, userId: string): VoiceChannel[] {
     return guild.channels.cache
         .filter((channel): channel is VoiceChannel =>
             isVoiceRoom(channel, categoryId)
-            && names.includes(channel.name)
+            && channel.permissionOverwrites.cache.get(userId)?.type === OverwriteType.Member
             && channel.members.size === 0,
         )
         .map((channel) => channel);

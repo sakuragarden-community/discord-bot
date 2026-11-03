@@ -18,15 +18,16 @@ import {
     LFG_DESCRIPTION_INPUT_ID,
     LFG_GAME_INPUT_ID,
     LFG_GAMES,
-    LFG_MODAL_BUTTON_ID,
-    LFG_MODAL_ID,
-    LFG_REASON_INPUT_ID,
-    LFG_REASONS,
+    LFG_GAMES_REASON,
+    LFG_MODAL_BUTTON_PREFIX,
+    LFG_MODAL_PREFIX,
+    LfgReason,
+    parseLfgReason,
 } from '../../utils/FindGroup';
 
 /**
- * Apre la modale per la creazione di un annuncio di ricerca gruppo al click del pulsante dedicato,
- * a meno che l'utente non abbia già un annuncio attivo.
+ * Apre la modale per la creazione di un annuncio di ricerca gruppo al click di uno dei pulsanti dedicati,
+ * uno per motivo, a meno che l'utente non abbia già un annuncio attivo.
  */
 @autoInjectable()
 export class LfgModalButtonHandler extends InteractionHandler {
@@ -43,10 +44,11 @@ export class LfgModalButtonHandler extends InteractionHandler {
     }
 
     public override parse(interaction: ButtonInteraction) {
-        return interaction.customId === LFG_MODAL_BUTTON_ID ? this.some() : this.none();
+        const reason = parseLfgReason(interaction.customId, LFG_MODAL_BUTTON_PREFIX);
+        return reason ? this.some(reason) : this.none();
     }
 
-    public override async run(interaction: ButtonInteraction) {
+    public override async run(interaction: ButtonInteraction, reason: LfgReason) {
         try {
             const channel = await fetchFindGroupChannel(this.settingsManager!);
             const announcement = await findActiveAnnouncement(channel, interaction.user.id);
@@ -60,43 +62,44 @@ export class LfgModalButtonHandler extends InteractionHandler {
             return;
         }
 
-        await interaction.showModal(this.buildModal());
+        await interaction.showModal(this.buildModal(reason));
     }
 
-    protected buildModal(): ModalBuilder {
-        const reason = new StringSelectMenuBuilder()
-            .setCustomId(LFG_REASON_INPUT_ID)
-            .setRequired(true)
-            .addOptions(LFG_REASONS.map(({ value, label }) => ({ value, label })));
-
-        // "Nessun gioco selezionato" è preselezionato, così chi non cerca giocatori può ignorare il campo
-        const game = new StringSelectMenuBuilder()
-            .setCustomId(LFG_GAME_INPUT_ID)
-            .setRequired(true)
-            .addOptions(LFG_GAMES.map(({ value, label }) => ({ value, label, default: value === 'none' })));
-
+    /** La modale chiede sempre la descrizione; solo chi cerca giocatori deve anche scegliere il gioco. */
+    protected buildModal(reason: LfgReason): ModalBuilder {
         const description = new TextInputBuilder()
             .setCustomId(LFG_DESCRIPTION_INPUT_ID)
             .setStyle(TextInputStyle.Paragraph)
             .setMaxLength(300)
             .setRequired(true);
 
-        // Le label sono limitate a 45 caratteri: il testo completo va nella description (massimo 100)
-        return new ModalBuilder()
-            .setCustomId(LFG_MODAL_ID)
-            .setTitle('Cerca Gruppo')
-            .addLabelComponents(
-                new LabelBuilder()
-                    .setLabel("Motivo dell'annuncio")
-                    .setDescription('Per quale motivo stai creando questo annuncio?')
-                    .setStringSelectMenuComponent(reason),
+        const labels: LabelBuilder[] = [];
+
+        if (reason.value === LFG_GAMES_REASON) {
+            // "Nessun gioco selezionato" è preselezionato: se non viene cambiato, l'invio restituisce un errore
+            const game = new StringSelectMenuBuilder()
+                .setCustomId(LFG_GAME_INPUT_ID)
+                .setRequired(true)
+                .addOptions(LFG_GAMES.map(({ value, label }) => ({ value, label, default: value === 'none' })));
+
+            labels.push(
                 new LabelBuilder()
                     .setLabel('Gioco')
-                    .setDescription("Se hai selezionato l'ultima voce, scegli per quale gioco stai cercando persone")
+                    .setDescription('Scegli per quale gioco stai cercando persone')
                     .setStringSelectMenuComponent(game),
-                new LabelBuilder()
-                    .setLabel('Descrivi il tuo annuncio')
-                    .setTextInputComponent(description),
             );
+        }
+
+        labels.push(
+            new LabelBuilder()
+                .setLabel('Descrivi il tuo annuncio')
+                .setTextInputComponent(description),
+        );
+
+        // Il titolo è limitato a 45 caratteri, entro cui rientrano le label dei motivi
+        return new ModalBuilder()
+            .setCustomId(`${LFG_MODAL_PREFIX}${reason.value}`)
+            .setTitle(reason.label)
+            .addLabelComponents(...labels);
     }
 }

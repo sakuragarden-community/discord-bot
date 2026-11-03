@@ -329,6 +329,22 @@
         "buttons": []
       },
       {
+        "type": "embed",
+        "embedColor": "alert",
+        "embedTitle": "Non ti interessa la funzione Cerca Gruppo?",
+        "content": "community/disablefindgroup.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/bot/create-announcement-for.png",
+        "buttons": []
+      },
+      {
         "type": "default",
         "embedColor": "",
         "embedTitle": "",
@@ -337,18 +353,38 @@
         "buttons": [
           {
             "type": "modal",
-            "id": "lfg-modal-button",
-            "label": "Clicca qui per creare un annuncio"
+            "id": "lfg-modal-button-voice",
+            "label": "🎙️ Chiacchierare in chiamata vocale",
+            "style": "secondary"
+          },
+          {
+            "type": "modal",
+            "id": "lfg-modal-button-art",
+            "label": "🎨 Fare arte in compagnia",
+            "style": "secondary"
+          },
+          {
+            "type": "modal",
+            "id": "lfg-modal-button-games",
+            "label": "🎮 Trovare giocatori per una partita",
+            "style": "secondary"
           }
         ]
       },
       {
-        "type": "embed",
-        "embedColor": "alert",
-        "embedTitle": "Non ti interessa la funzione Cerca Gruppo?",
-        "content": "community/disablefindgroup.md",
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
         "image": "",
-        "buttons": []
+        "buttons": [
+          {
+            "type": "action",
+            "id": "lfg-delete-button",
+            "label": "❌ Elimina annuncio",
+            "style": "danger"
+          }
+        ]
       }
     ]
   },

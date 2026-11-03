@@ -49,7 +49,7 @@ export class CreateVoiceModalButtonHandler extends InteractionHandler {
 
         try {
             const categoryId = await fetchVoicesCategoryId(this.settingsManager!);
-            const [room] = findEmptyVoiceRooms(interaction.guild, categoryId, interaction.user.username);
+            const [room] = findEmptyVoiceRooms(interaction.guild, categoryId, interaction.user.id);
             if (room) {
                 await interaction.reply({ content: emptyVoiceRoomError(room), flags: MessageFlags.Ephemeral });
                 return;

@@ -4,10 +4,13 @@ import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
+    CategoryChannel,
+    ChannelType,
     ChatInputCommandInteraction,
     ColorResolvable,
     EmbedBuilder,
     Guild,
+    GuildBasedChannel,
     GuildTextBasedChannel,
     InteractionContextType,
     Message,
@@ -24,6 +27,17 @@ import { SettingsManager } from '../../managers/SettingsManager';
 const MESSAGES_FILE = 'setup/messages.json';
 const CONTENT_DIR = 'setup/content';
 
+/**
+ * Pattern delle decorazioni applicate dall'entità `decorations`.
+ * `{{name}}` è il nome identificativo del canale/categoria, `{{emoji}}` la sua emoji.
+ */
+const CATEGORY_NAME_PATTERN = '❀━━┓ {{emoji}} {{name}} {{emoji}} ┏━━❀';
+const CHANNEL_NAME_PATTERN = '┣╸{{emoji}}・{{name}}';
+const LAST_CHANNEL_NAME_PATTERN = '┗╸{{emoji}}・{{name}}';
+
+/** Riconosce una singola emoji (anche composta: ZWJ, variation selector, bandiere, keycap). */
+const EMOJI_REGEX = new RegExp('\\p{RGI_Emoji}', 'gv');
+
 /** Pulsante che apre un link esterno. */
 interface SetupLinkButton {
     type: 'link';
@@ -31,16 +45,29 @@ interface SetupLinkButton {
     url: string;
 }
 
-/** Pulsante che apre una modale, gestita dall'interaction handler associato all'ID. */
-interface SetupModalButton {
-    type: 'modal';
+/** Stili dei pulsanti con custom ID, mappati sui {@link ButtonStyle} di Discord. */
+const BUTTON_STYLES = {
+    primary: ButtonStyle.Primary,
+    secondary: ButtonStyle.Secondary,
+    success: ButtonStyle.Success,
+    danger: ButtonStyle.Danger,
+} as const;
+
+/**
+ * Pulsante gestito dall'interaction handler associato all'ID: `modal` apre una modale,
+ * `action` esegue direttamente un'azione.
+ */
+interface SetupInteractiveButton {
+    type: 'modal' | 'action';
     /** Custom ID assegnato al pulsante. */
     id: string;
     label: string;
+    /** Stile del pulsante, `primary` se omesso. */
+    style?: keyof typeof BUTTON_STYLES;
 }
 
 /** Pulsante da inserire come interactive component del messaggio. */
-type SetupButton = SetupLinkButton | SetupModalButton;
+type SetupButton = SetupLinkButton | SetupInteractiveButton;
 
 /** Definizione di un messaggio da pubblicare. */
 interface SetupMessage {
@@ -62,6 +89,14 @@ interface SetupChannel {
 }
 
 type SetupMessagesFile = Record<string, SetupChannel>;
+
+/** Esito della decorazione di un singolo canale o categoria. */
+interface DecorationResult {
+    oldName: string;
+    newName?: string;
+    status: 'renamed' | 'unchanged' | 'skipped' | 'error';
+    error?: string;
+}
 
 /** Esito del setup di un singolo canale. */
 interface ChannelSetupResult {
@@ -95,7 +130,10 @@ export class SetupCommand extends Command {
                         .setName('entity')
                         .setDescription('Entità da allestire')
                         .setRequired(true)
-                        .addChoices({ name: 'messages', value: 'messages' }),
+                        .addChoices(
+                            { name: 'messages', value: 'messages' },
+                            { name: 'decorations', value: 'decorations' },
+                        ),
                 )
                 .addStringOption((option) =>
                     option
@@ -146,6 +184,11 @@ export class SetupCommand extends Command {
                         break;
                     }
                     await interaction.editReply(this.formatMessagesReport(results));
+                    break;
+                }
+                case 'decorations': {
+                    const results = await this.setupDecorations(interaction.guild);
+                    await interaction.editReply(this.formatDecorationsReport(results));
                     break;
                 }
                 default:
@@ -205,6 +248,87 @@ export class SetupCommand extends Command {
         }
 
         return result;
+    }
+
+    /**
+     * Rinomina categorie e relativi canali secondo i pattern di decorazione,
+     * mantenendo nome identificativo ed emoji di ciascuno.
+     */
+    protected async setupDecorations(guild: Guild): Promise<DecorationResult[]> {
+        const channels = await guild.channels.fetch();
+        const categories = [...channels.values()]
+            .filter((channel): channel is CategoryChannel => channel?.type === ChannelType.GuildCategory)
+            .sort((a, b) => a.rawPosition - b.rawPosition || a.id.localeCompare(b.id));
+
+        const results: DecorationResult[] = [];
+        for (const category of categories) {
+            results.push(await this.decorate(category, CATEGORY_NAME_PATTERN));
+
+            const children = this.sortByDisplayOrder([...category.children.cache.values()]);
+            for (const [index, child] of children.entries()) {
+                const pattern = index === children.length - 1 ? LAST_CHANNEL_NAME_PATTERN : CHANNEL_NAME_PATTERN;
+                results.push(await this.decorate(child, pattern));
+            }
+        }
+        return results;
+    }
+
+    /** Ordina i canali come appaiono nella sidebar di Discord: prima i testuali, poi i vocali. */
+    protected sortByDisplayOrder(channels: GuildBasedChannel[]): GuildBasedChannel[] {
+        const isVoice = (channel: GuildBasedChannel) =>
+            channel.type === ChannelType.GuildVoice || channel.type === ChannelType.GuildStageVoice;
+
+        return channels.sort((a, b) =>
+            Number(isVoice(a)) - Number(isVoice(b))
+            || ('rawPosition' in a && 'rawPosition' in b ? a.rawPosition - b.rawPosition : 0)
+            || a.id.localeCompare(b.id),
+        );
+    }
+
+    /** Rinomina il canale applicando il pattern; ignora i canali senza emoji. */
+    protected async decorate(channel: GuildBasedChannel, pattern: string): Promise<DecorationResult> {
+        const result: DecorationResult = { oldName: channel.name, status: 'unchanged' };
+
+        const parsed = this.parseDecoratedName(channel.name);
+        if (!parsed) {
+            result.status = 'skipped';
+            result.error = 'emoji o nome identificativo non trovati';
+            return result;
+        }
+
+        const newName = pattern
+            .split('{{emoji}}').join(parsed.emoji)
+            .split('{{name}}').join(parsed.name);
+        result.newName = newName;
+        if (newName === channel.name) return result;
+
+        try {
+            await channel.setName(newName, 'Setup decorazioni');
+            result.status = 'renamed';
+        } catch (error) {
+            console.error(`[SetupCommand] Errore durante la rinomina di "${channel.name}":`, error);
+            result.status = 'error';
+            result.error = error instanceof Error ? error.message : String(error);
+        }
+        return result;
+    }
+
+    /**
+     * Estrae emoji e nome identificativo da un nome decorato, es. "┣╸🗣️・formattazione-testo"
+     * → { emoji: "🗣️", name: "formattazione-testo" }. L'emoji è la prima presente nel nome; il
+     * nome identificativo è ciò che resta rimuovendo le emoji e i caratteri decorativi agli estremi.
+     */
+    protected parseDecoratedName(fullName: string): { emoji: string; name: string } | null {
+        const emoji = fullName.match(EMOJI_REGEX)?.[0];
+        if (!emoji) return null;
+
+        const name = fullName
+            .replace(EMOJI_REGEX, ' ')
+            .replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '')
+            .trim();
+        if (!name) return null;
+
+        return { emoji, name };
     }
 
     /** Elimina tutti i messaggi inviati dal bot nel canale, ritornandone il numero. */
@@ -286,16 +410,22 @@ export class SetupCommand extends Command {
                         );
                         break;
                     case 'modal':
+                    case 'action': {
                         if (!button.id) {
-                            throw new Error(`il pulsante "${button.label}" di tipo modal non ha un id`);
+                            throw new Error(`il pulsante "${button.label}" di tipo ${button.type} non ha un id`);
+                        }
+                        const style = BUTTON_STYLES[button.style ?? 'primary'];
+                        if (style === undefined) {
+                            throw new Error(`stile "${button.style}" del pulsante "${button.label}" non supportato`);
                         }
                         row.addComponents(
                             new ButtonBuilder()
-                                .setStyle(ButtonStyle.Primary)
+                                .setStyle(style)
                                 .setLabel(button.label)
                                 .setCustomId(button.id),
                         );
                         break;
+                    }
                     default:
                         throw new Error(`tipo di pulsante "${(button as { type: string }).type}" non supportato`);
                 }
@@ -312,6 +442,23 @@ export class SetupCommand extends Command {
 
     protected loadContent(file: string): string {
         return fs.readFileSync(path.join(CONTENT_DIR, file), 'utf-8').trim();
+    }
+
+    /** Riepilogo delle decorazioni: conteggi e dettaglio dei soli canali non rinominati con successo. */
+    protected formatDecorationsReport(results: DecorationResult[]): string {
+        const count = (status: DecorationResult['status']) => results.filter((r) => r.status === status).length;
+        const lines = [
+            'Setup delle decorazioni completato.',
+            `✅ rinominati: ${count('renamed')} — invariati: ${count('unchanged')} — ignorati: ${count('skipped')} — errori: ${count('error')}`,
+            ...results
+                .filter((r) => r.status === 'skipped' || r.status === 'error')
+                .map((r) => `${r.status === 'error' ? '❌' : '⚠️'} **${r.oldName}** — ${r.error}`),
+        ];
+
+        // Limite di 2000 caratteri per messaggio
+        let report = lines.join('\n');
+        if (report.length > 2000) report = report.slice(0, 1997) + '...';
+        return report;
     }
 
     /** Riepilogo del setup, una riga per canale. */

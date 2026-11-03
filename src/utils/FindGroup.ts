@@ -2,10 +2,15 @@ import { container } from '@sapphire/framework';
 import { ChannelType, Message, TextChannel, time, TimestampStyles } from 'discord.js';
 import { SettingsManager } from '../managers/SettingsManager';
 
-/** Custom ID del pulsante pubblicato nel canale findGroup (vedi setup/messages.json). */
-export const LFG_MODAL_BUTTON_ID = 'lfg-modal-button';
-export const LFG_MODAL_ID = 'lfg-modal';
-export const LFG_REASON_INPUT_ID = 'lfg-reason';
+/**
+ * Prefisso dei custom ID dei pulsanti pubblicati nel canale findGroup (vedi setup/messages.json):
+ * è seguito dal valore del motivo in {@link LFG_REASONS}, es. `lfg-modal-button-voice`.
+ */
+export const LFG_MODAL_BUTTON_PREFIX = 'lfg-modal-button-';
+/** Prefisso dei custom ID delle modali, seguito dal valore del motivo come per i pulsanti. */
+export const LFG_MODAL_PREFIX = 'lfg-modal-';
+/** Custom ID del pulsante che elimina l'annuncio attivo dell'utente. */
+export const LFG_DELETE_BUTTON_ID = 'lfg-delete-button';
 export const LFG_GAME_INPUT_ID = 'lfg-game';
 export const LFG_DESCRIPTION_INPUT_ID = 'lfg-description';
 
@@ -41,6 +46,15 @@ export const LFG_GAMES = [
     { value: 'ffxiv', label: 'Final Fantasy XIV', role: '1466955077741711519' },
     { value: 'tft', label: 'Teamfight Tactics', role: '1466955157421162657' },
 ] as const;
+
+export type LfgReason = typeof LFG_REASONS[number];
+
+/** Risolve il motivo a partire dal custom ID di un pulsante o di una modale; `null` se non corrisponde. */
+export function parseLfgReason(customId: string, prefix: string): LfgReason | null {
+    if (!customId.startsWith(prefix)) return null;
+    const value = customId.slice(prefix.length);
+    return LFG_REASONS.find((reason) => reason.value === value) ?? null;
+}
 
 /** Recupera il canale find_group dalla configurazione `channels/community/find_group`. */
 export async function fetchFindGroupChannel(settingsManager: SettingsManager): Promise<TextChannel> {
@@ -87,4 +101,13 @@ export function activeAnnouncementError(announcement: Message): string {
     const expiresAt = new Date(announcement.createdTimestamp + LFG_MAX_AGE_MS);
     return `❌ Hai già un annuncio attivo: ${announcement.url}\n`
         + `Devi attendere che scada prima di poterne creare un altro. Scadrà ${time(expiresAt, TimestampStyles.RelativeTime)}.`;
+}
+
+/** Elimina l'annuncio insieme al suo thread: eliminare il messaggio d'origine non elimina il thread. */
+export async function deleteAnnouncement(announcement: Message): Promise<void> {
+    // Il thread nato da un messaggio ne condivide l'ID, quindi è recuperabile anche se non è in cache
+    const thread = announcement.thread
+        ?? await (announcement.channel as TextChannel).threads.fetch(announcement.id).catch(() => null);
+    await thread?.delete('Annuncio cerca gruppo eliminato dall\'autore');
+    await announcement.delete();
 }

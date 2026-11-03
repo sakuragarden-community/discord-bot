@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
-import { ChannelType, MessageFlags, ModalSubmitInteraction } from 'discord.js';
+import { ChannelType, MessageFlags, ModalSubmitInteraction, OverwriteType, PermissionFlagsBits } from 'discord.js';
 import { autoInjectable } from 'tsyringe';
 import { SettingsManager } from '../../managers/SettingsManager';
 import {
@@ -58,22 +58,38 @@ export class CreateVoiceModalSubmitHandler extends InteractionHandler {
 
             const guild = interaction.guild;
             const member = interaction.member;
-            const username = interaction.user.username;
             const categoryId = await fetchVoicesCategoryId(this.settingsManager!);
 
             // Verifica ripetuta all'invio: la modale potrebbe essere stata aperta più volte prima di confermare
-            const [emptyRoom] = findEmptyVoiceRooms(guild, categoryId, username);
+            const [emptyRoom] = findEmptyVoiceRooms(guild, categoryId, member.id);
             if (emptyRoom) {
                 await interaction.editReply(emptyVoiceRoomError(emptyRoom));
                 return;
             }
 
+            // Passando degli overwrite la stanza non eredita quelli della categoria, che vanno quindi copiati.
+            // L'overwrite intestato al creatore serve a riconoscerne la stanza (vedi findEmptyVoiceRooms).
+            const category = guild.channels.cache.get(categoryId);
+            const categoryOverwrites = category && 'permissionOverwrites' in category
+                ? [...category.permissionOverwrites.cache.values()]
+                : [];
+            const ownOverwrite = categoryOverwrites.find((overwrite) => overwrite.id === member.id);
+
             const room = await guild.channels.create({
-                name: buildVoiceRoomName(type, username),
+                name: buildVoiceRoomName(type, member.displayName),
                 type: ChannelType.GuildVoice,
                 parent: categoryId,
                 userLimit,
-                reason: `Stanza vocale creata da ${username}`,
+                permissionOverwrites: [
+                    ...categoryOverwrites.filter((overwrite) => overwrite.id !== member.id),
+                    {
+                        id: member.id,
+                        type: OverwriteType.Member,
+                        allow: (ownOverwrite?.allow.bitfield ?? BigInt(0)) | PermissionFlagsBits.Connect,
+                        deny: (ownOverwrite?.deny.bitfield ?? BigInt(0)) & ~PermissionFlagsBits.Connect,
+                    },
+                ],
+                reason: `Stanza vocale creata da ${interaction.user.username}`,
             });
 
             // Chi è già in vocale viene spostato nella stanza; altrimenti la stanza viene eliminata se resta vuota
