@@ -422,6 +422,92 @@
         ]
       }
     ]
+  },
+  "modTools": {
+    "settingPath": "channels/staff/mod_tools",
+    "messages": [
+      {
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/bot/mod-tools.png",
+        "buttons": []
+      },
+      {
+        "type": "embed",
+        "embedColor": "primary",
+        "embedTitle": "🛡️ Strumenti di moderazione",
+        "content": "staff/modtools.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "type": "embed",
+        "embedColor": "snow",
+        "embedTitle": "🧰 Menu degli strumenti",
+        "content": "staff/modtoolsmenu.md",
+        "image": "",
+        "buttons": []
+      }
+    ]
+  },
+  "eventsManagement": {
+    "settingPath": "channels/staff/events_management",
+    "messages": [
+      {
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "https://sakuragarden.it/images/bot/events-management.png",
+        "buttons": []
+      },
+      {
+        "type": "embed",
+        "embedColor": "primary",
+        "embedTitle": "🎉 Gestione degli eventi",
+        "content": "staff/eventsmanagement.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "type": "embed",
+        "embedColor": "alert",
+        "embedTitle": "📆 Come funziona la pianificazione degli eventi",
+        "content": "staff/eventsplanning.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "type": "embed",
+        "embedColor": "snow",
+        "embedTitle": "🧭 Thread degli eventi",
+        "content": "staff/eventsmenu.md",
+        "image": "",
+        "buttons": [
+          {
+            "type": "link",
+            "label": "\uD83E\uDEC2 Social",
+            "url": "https://discord.com/channels/1302653623360294942/1567498838762061884"
+          },
+          {
+            "type": "link",
+            "label": "\uD83C\uDFA8 Arte",
+            "url": "https://discord.com/channels/1302653623360294942/1567498891233075361"
+          },
+          {
+            "type": "link",
+            "label": "\uD83D\uDD2B Overwatch",
+            "url": "https://discord.com/channels/1302653623360294942/1567499063979409468"
+          },
+          {
+            "type": "link",
+            "label": "\uD83E\uDDD9\u200D♂\uFE0F Magic The Gathering",
+            "url": "https://discord.com/channels/1302653623360294942/1567499129201102938"
+          }
+        ]
+      }
+    ]
   }
 }
-
