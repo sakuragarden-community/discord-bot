@@ -30,21 +30,26 @@ export const LFG_REASONS = [
 /** Motivo per cui ha senso scegliere un gioco. */
 export const LFG_GAMES_REASON = 'games';
 
-/** Giochi selezionabili, con l'ID del ruolo da taggare; `none` indica che non è stato scelto alcun gioco. */
+/**
+ * Giochi selezionabili, con l'ID del ruolo da taggare; `none` indica che non è stato scelto alcun gioco.
+ * Dopo `none` vengono le opzioni generiche "Altro", poi i giochi in ordine alfabetico.
+ */
 export const LFG_GAMES = [
     { value: 'none', label: 'Nessun gioco selezionato', role: null },
-    { value: 'overwatch', label: 'Overwatch', role: '1367453856618778655' },
-    { value: 'mtg', label: 'Magic: The Gathering', role: '1427636433346367488' },
-    { value: 'party-games', label: 'Party Games', role: '1507355089076224092' },
-    { value: 'yugioh', label: 'Yu-Gi-Oh!', role: '1542119720680038420' },
-    { value: 'minecraft', label: 'Minecraft', role: '1307500035625451603' },
-    { value: 'wow', label: 'World of Warcraft', role: '1549026118181593190' },
+    { value: 'other-videogames', label: 'Altro (Videogiochi)', role: '1416978499431956581' },
+    { value: 'other-card-games', label: 'Altro (Giochi di Carte)', role: '1466947929557176360' },
     { value: 'destiny-2', label: 'Destiny 2', role: '1554155721338261524' },
-    { value: 'warframe', label: 'Warframe', role: '1521212208007352340' },
+    { value: 'ffxiv', label: 'Final Fantasy XIV', role: '1466955077741711519' },
     { value: 'genshin-impact', label: 'Genshin Impact', role: '1427636727429726349' },
     { value: 'lol', label: 'League of Legends', role: '1466955120565686423' },
-    { value: 'ffxiv', label: 'Final Fantasy XIV', role: '1466955077741711519' },
+    { value: 'mtg', label: 'Magic: The Gathering', role: '1427636433346367488' },
+    { value: 'minecraft', label: 'Minecraft', role: '1307500035625451603' },
+    { value: 'overwatch', label: 'Overwatch', role: '1367453856618778655' },
+    { value: 'party-games', label: 'Party Games', role: '1507355089076224092' },
     { value: 'tft', label: 'Teamfight Tactics', role: '1466955157421162657' },
+    { value: 'warframe', label: 'Warframe', role: '1521212208007352340' },
+    { value: 'wow', label: 'World of Warcraft', role: '1549026118181593190' },
+    { value: 'yugioh', label: 'Yu-Gi-Oh!', role: '1542119720680038420' },
 ] as const;
 
 export type LfgReason = typeof LFG_REASONS[number];

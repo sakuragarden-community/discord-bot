@@ -87,10 +87,6 @@ export class LfgModalSubmitHandler extends InteractionHandler {
                 allowedMentions: { users: [author.id], roles: [announcement.roleId] },
             });
 
-            // Una reaction mancata non invalida l'annuncio, già pubblicato
-            await message.react('✅').catch((error) =>
-                console.error('[LfgModalSubmitHandler] Errore durante l\'aggiunta della reaction:', error));
-
             // Il thread nasce dal messaggio dell'annuncio, così la pulizia periodica può rimuoverli insieme
             const thread = await message.startThread({
                 name: this.buildThreadName(authorName, announcement),

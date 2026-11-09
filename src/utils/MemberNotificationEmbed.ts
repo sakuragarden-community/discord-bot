@@ -1,4 +1,4 @@
-import { ColorResolvable, EmbedBuilder, User } from "discord.js";
+import { APIEmbedField, ColorResolvable, EmbedBuilder, escapeMarkdown, hyperlink, User } from "discord.js";
 import { Member } from "../managers/MemberManager";
 
 /** Dati per costruire la notifica allo Staff su ingresso/uscita di un membro. */
@@ -22,17 +22,25 @@ function formatDate(value: string | null | undefined): string {
 export function buildMemberNotificationEmbed(options: MemberNotificationOptions): EmbedBuilder {
     const { user, member, title, description, color } = options;
 
+    const fields: APIEmbedField[] = [
+        { name: '👤 Utente', value: escapeMarkdown(member?.username ?? user.username), inline: true },
+        { name: '📥 Ingresso', value: formatDate(member?.joinedAt), inline: true },
+    ];
+    // Senza una data di uscita il membro è al primo ingresso: la voce sarebbe sempre vuota
+    if (member?.leftAt) {
+        fields.push({ name: '📤 Uscita', value: formatDate(member.leftAt), inline: true });
+    }
+    fields.push(
+        { name: '🗣 Presentazione', value: member?.presentation ?? 'Non presente' },
+        // Il footer non supporta i link: ID e collegamento al profilo stanno in un campo dedicato
+        { name: '🆔 Discord ID', value: `${user.id} • ${hyperlink('Link', `https://discord.com/users/${user.id}`)}` },
+    );
+
     return new EmbedBuilder()
         .setTitle(title)
         .setColor(color)
         .setDescription(description)
         .setThumbnail(user.displayAvatarURL({ size: 512 }))
-        .addFields(
-            { name: '👤 Utente', value: `${user.toString()} (${member?.username ?? user.username})`, inline: true },
-            { name: '📥 Ingresso', value: formatDate(member?.joinedAt), inline: true },
-            { name: '📤 Uscita', value: formatDate(member?.leftAt), inline: true },
-            { name: '🗣 Presentazione', value: member?.presentation ?? 'Non presente' },
-        )
-        .setFooter({ text: `Discord ID: ${user.id}` })
+        .addFields(fields)
         .setTimestamp();
 }
