@@ -1,6 +1,9 @@
 import "reflect-metadata";
 import { autoInjectable } from "tsyringe";
-import { ApiManager, KodamaApiError } from "./ApiManager";
+import { ApiManager, KodamaApiError, PageResponse } from "./ApiManager";
+
+/** Riesportato per compatibilità: il tipo è definito in {@link ApiManager}. */
+export type { PageResponse } from "./ApiManager";
 
 /** Stato del ciclo di vita di un membro all'interno del server Discord. */
 export type MemberStatus = "ACTIVE" | "INACTIVE" | "LEFT" | "BANNED";
@@ -53,16 +56,6 @@ export interface MemberListParams {
     size?: number;
     /** Default lato server: `id,asc`. */
     sort?: string;
-}
-
-/** Involucro di paginazione esposto dalle API. */
-export interface PageResponse<T> {
-    content: T[];
-    page: number;
-    size: number;
-    totalElements: number;
-    totalPages: number;
-    last: boolean;
 }
 
 /**

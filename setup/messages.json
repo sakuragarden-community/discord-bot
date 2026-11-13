@@ -481,6 +481,41 @@
       },
       {
         "type": "embed",
+        "embedColor": "secondary",
+        "embedTitle": "🛠️ Strumenti di gestione",
+        "content": "staff/eventstools.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
+        "image": "",
+        "buttons": [
+          {
+            "type": "modal",
+            "id": "event-plan-button",
+            "label": "📅 Pianifica Evento",
+            "style": "success"
+          },
+          {
+            "type": "modal",
+            "id": "event-create-button",
+            "label": "🎉 Crea Evento",
+            "style": "secondary"
+          },
+          {
+            "type": "modal",
+            "id": "event-template-create-button",
+            "label": "📝 Crea Template Evento",
+            "style": "secondary"
+          }
+        ]
+      },
+      {
+        "type": "embed",
         "embedColor": "snow",
         "embedTitle": "🧭 Thread degli eventi",
         "content": "staff/eventsmenu.md",

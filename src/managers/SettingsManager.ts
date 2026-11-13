@@ -132,6 +132,12 @@ export class SettingsManager {
         return this.getSetting("channels/community/find_group");
     }
 
+    /** Canale vocale in cui si svolgono gli eventi programmati su Discord. */
+    public async getEventsRoomChannelId()
+    {
+        return this.getSetting("channels/community/events_room");
+    }
+
     public async getVoicesCategoryId()
     {
         return this.getSetting("voice/general/category_id");

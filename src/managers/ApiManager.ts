@@ -16,6 +16,16 @@ export interface ApiErrorBody {
     violations?: ApiViolation[];
 }
 
+/** Involucro di paginazione esposto dalle API. */
+export interface PageResponse<T> {
+    content: T[];
+    page: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
+    last: boolean;
+}
+
 /** Errore applicativo sollevato dalle chiamate alle API Kodama. */
 export class KodamaApiError extends Error {
 
@@ -105,5 +115,21 @@ export class ApiManager {
             body?.violations ?? [],
             body,
         );
+    }
+
+    /** Scorre tutte le pagine restituite da `fetchPage` e ne concatena il contenuto. */
+    public async fetchAllPages<T>(fetchPage: (page: number) => Promise<PageResponse<T>>): Promise<T[]> {
+        const items: T[] = [];
+        let page = 0;
+        let last = false;
+
+        while (!last) {
+            const response = await fetchPage(page);
+            items.push(...response.content);
+            last = response.last || response.content.length === 0;
+            page++;
+        }
+
+        return items;
     }
 }
