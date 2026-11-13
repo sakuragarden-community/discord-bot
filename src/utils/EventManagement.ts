@@ -1,13 +1,35 @@
 import { Interaction, PermissionFlagsBits, Role } from 'discord.js';
 import { KodamaApiError } from '../managers/ApiManager';
 import { Event } from '../managers/EventManager';
+import { EventTemplate } from '../managers/EventTemplateManager';
 
 /** Custom ID dei pulsanti pubblicati nel canale eventsManagement (vedi setup/messages.json). */
 export const EVENT_PLAN_BUTTON_ID = 'event-plan-button';
 export const EVENT_CREATE_BUTTON_ID = 'event-create-button';
 export const EVENT_TEMPLATE_CREATE_BUTTON_ID = 'event-template-create-button';
+export const EVENT_EDIT_BUTTON_ID = 'event-edit-button';
+export const EVENT_DELETE_BUTTON_ID = 'event-delete-button';
+export const EVENT_TEMPLATE_EDIT_BUTTON_ID = 'event-template-edit-button';
+export const EVENT_TEMPLATE_DELETE_BUTTON_ID = 'event-template-delete-button';
 
-/** Modale "Crea Evento". */
+/**
+ * Modali di selezione dell'evento o del template da modificare o cancellare. Una modale non può aprirne un'altra:
+ * dopo la selezione della modifica il bot risponde con un pulsante "continua", che apre la modale precompilata.
+ */
+export const EVENT_EDIT_SELECT_MODAL_ID = 'event-edit-select-modal';
+export const EVENT_DELETE_SELECT_MODAL_ID = 'event-delete-select-modal';
+export const EVENT_SELECT_INPUT_ID = 'event-select';
+export const EVENT_TEMPLATE_EDIT_SELECT_MODAL_ID = 'event-template-edit-select-modal';
+export const EVENT_TEMPLATE_DELETE_SELECT_MODAL_ID = 'event-template-delete-select-modal';
+export const EVENT_TEMPLATE_SELECT_INPUT_ID = 'event-template-select';
+
+/** Pulsanti e modali di modifica: il custom ID è seguito da `:<id>` del record da aggiornare (vedi {@link withRecordId}). */
+export const EVENT_EDIT_CONTINUE_BUTTON_ID = 'event-edit-continue-button';
+export const EVENT_EDIT_MODAL_ID = 'event-edit-modal';
+export const EVENT_TEMPLATE_EDIT_CONTINUE_BUTTON_ID = 'event-template-edit-continue-button';
+export const EVENT_TEMPLATE_EDIT_MODAL_ID = 'event-template-edit-modal';
+
+/** Modale "Crea Evento" (e "Modifica Evento", con gli stessi campi). */
 export const EVENT_CREATE_MODAL_ID = 'event-create-modal';
 export const EVENT_NAME_INPUT_ID = 'event-name';
 export const EVENT_SECTION_INPUT_ID = 'event-section';
@@ -16,11 +38,13 @@ export const EVENT_MAX_PARTICIPANTS_INPUT_ID = 'event-max-participants';
 export const EVENT_IS_OPEN_INPUT_ID = 'event-is-open';
 
 /**
- * Modale "Crea Template Evento": i campi sono sette e una modale ne contiene al massimo cinque, quindi è divisa
- * in due passi. Il primo raccoglie l'evento Discord, il secondo — aperto dal pulsante "Continua" — la notizia.
+ * Modale "Crea Template Evento" (e "Modifica Template Evento", con gli stessi campi): i campi sono otto e una modale
+ * ne contiene al massimo cinque, quindi è divisa in due passi. Il primo raccoglie nome del template ed evento Discord,
+ * il secondo — aperto dal pulsante "Continua" — la notizia.
  */
 export const EVENT_TEMPLATE_MODAL_ID = 'event-template-modal';
 export const EVENT_TEMPLATE_EVENT_INPUT_ID = 'event-template-event';
+export const EVENT_TEMPLATE_NAME_INPUT_ID = 'event-template-name';
 export const EVENT_TEMPLATE_TITLE_INPUT_ID = 'event-template-title';
 export const EVENT_TEMPLATE_DESCRIPTION_INPUT_ID = 'event-template-description';
 export const EVENT_TEMPLATE_IMAGE_INPUT_ID = 'event-template-image';
@@ -47,12 +71,46 @@ export const DISCORD_LIMITS = {
     message: 2000,
     threadName: 100,
     selectLabel: 100,
+    buttonLabel: 80,
 } as const;
+
+/** Testo del link al thread delle iscrizioni, per gli eventi chiusi (notizia ed evento Discord). */
+export const EVENT_SIGNUP_LINK_LABEL = 'PREMI QUI PER ISCRIVERTI ALL\'EVENTO!';
 
 /** Formati di immagine accettati da Discord come copertina di un evento. */
 export const EVENT_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'] as const;
 
 export const NO_PERMISSION_MESSAGE = '❌ Non hai i permessi necessari per eseguire questa operazione.';
+
+/** Accoda al custom ID l'id del record a cui si riferisce, es. `event-edit-modal:3`. */
+export function withRecordId(customId: string, id: number): string {
+    return `${customId}:${id}`;
+}
+
+/** Id del record accodato al custom ID con {@link withRecordId}, o `null` se il custom ID non corrisponde. */
+export function parseRecordId(customId: string, prefix: string): number | null {
+    const match = customId.match(/^(.+):(\d+)$/);
+    return match && match[1] === prefix ? Number(match[2]) : null;
+}
+
+/** Opzioni di una select di eventi: nome dell'evento, con la sezione come descrizione. */
+export function eventOptions(events: Event[], selectedId?: number) {
+    return events.slice(0, SELECT_MAX_OPTIONS).map(({ id, name, sectionName }) => ({
+        value: String(id),
+        label: truncate(name, DISCORD_LIMITS.selectLabel),
+        description: truncate(sectionName, DISCORD_LIMITS.selectLabel),
+        default: id === selectedId,
+    }));
+}
+
+/** Opzioni di una select di template: nome del template, con il nome dell'evento come descrizione. */
+export function eventTemplateOptions(templates: EventTemplate[]) {
+    return templates.slice(0, SELECT_MAX_OPTIONS).map(({ id, name, eventName }) => ({
+        value: String(id),
+        label: truncate(name, DISCORD_LIMITS.selectLabel),
+        description: truncate(eventName, DISCORD_LIMITS.selectLabel),
+    }));
+}
 
 /** Solo chi ha i permessi di amministrazione può gestire gli eventi. */
 export function isAdministrator(interaction: Interaction): boolean {
@@ -172,6 +230,24 @@ export function formatZonedTime(date: Date): string {
     }).format(date);
 }
 
+/** Data estesa senza anno, es. `sabato 21 novembre`, nel fuso orario degli eventi. */
+export function formatZonedLongDate(date: Date): string {
+    return new Intl.DateTimeFormat('it-IT', {
+        timeZone: EVENTS_TIME_ZONE,
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+    }).format(date);
+}
+
+/**
+ * Sostituisce nel testo le variabili `{{nome}}` con i valori indicati; gli spazi dentro le graffe sono ignorati e
+ * le variabili sconosciute restano come sono.
+ */
+export function replaceTemplateVariables(text: string, values: Record<string, string>): string {
+    return text.replace(/\{\{\s*(\w+)\s*\}\}/g, (match, name: string) => values[name] ?? match);
+}
+
 /** Data e ora nel formato `GG/MM/AAAA HH:MM`, nel fuso orario degli eventi. */
 export function formatZonedDateTime(date: Date): string {
     const { year, month, day } = getZonedParts(date, EVENTS_TIME_ZONE);
@@ -191,13 +267,19 @@ export function buildDiscordEventDescription(event: Event, role: Role, descripti
     return truncate(`**${roleLabel} | 👥 ${participants} | ${access}**\n${description}`, DISCORD_LIMITS.eventDescription);
 }
 
-/** Dati raccolti dal primo passo della creazione di un template, in attesa del secondo. */
+/** Dati raccolti dal primo passo della creazione o modifica di un template, in attesa del secondo. */
 export interface EventTemplateDraft {
+    /** Template in modifica, usato per precompilare il secondo passo; assente in creazione. */
+    existing?: EventTemplate;
     eventId: number;
+    name: string;
     discordEventTitle: string;
     discordEventDescription: string;
-    /** Immagine già scaricata, come data URI: l'URL dell'allegato Discord scade. */
-    discordEventImage: string;
+    /**
+     * Immagine già scaricata, come data URI: l'URL dell'allegato Discord scade. In modifica è assente se l'immagine
+     * non viene sostituita.
+     */
+    discordEventImage?: string;
 }
 
 /** Tempo entro cui completare il secondo passo, trascorso il quale la bozza viene scartata. */
@@ -226,4 +308,4 @@ export function deleteEventTemplateDraft(userId: string): void {
 
 export const EVENT_TEMPLATE_DRAFT_EXPIRED_MESSAGE =
     '❌ I dati del primo passo non sono più disponibili (sono passati più di 15 minuti o il bot è stato riavviato). '
-    + 'Ricomincia premendo di nuovo "Crea Template Evento".';
+    + 'Ricomincia premendo di nuovo "Crea Template Evento" o "Modifica Template Evento".';

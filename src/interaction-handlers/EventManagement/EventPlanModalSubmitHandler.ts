@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
 import {
     ChannelType,
+    Client,
     Guild,
     GuildScheduledEvent,
     GuildScheduledEventEntityType,
@@ -12,6 +13,7 @@ import {
 import { autoInjectable } from 'tsyringe';
 import { EventEdition, EventEditionManager } from '../../managers/EventEditionManager';
 import { EventManager } from '../../managers/EventManager';
+import { EVENT_NEWS_KINDS, EventNewsKind, EventNewsManager } from '../../managers/EventNewsManager';
 import { EventTemplateManager } from '../../managers/EventTemplateManager';
 import { SettingsManager } from '../../managers/SettingsManager';
 import {
@@ -27,6 +29,12 @@ import {
     validationError,
 } from '../../utils/EventManagement';
 
+/** Nomi delle notizie nei messaggi della modalità di test. */
+const NEWS_KIND_LABELS: Record<EventNewsKind, string> = {
+    'week-before': 'Settimana prima',
+    'same-day': 'Giorno stesso',
+};
+
 /** Etichette dei campi della modale, usate nei messaggi di validazione delle API. */
 const FIELD_LABELS: Record<string, string> = {
     eventTemplateId: 'Template Evento',
@@ -37,6 +45,9 @@ const FIELD_LABELS: Record<string, string> = {
  * Salva tramite le API l'edizione evento compilata nella modale "Pianifica Evento" e crea il corrispondente
  * evento programmato su Discord. Se la creazione su Discord fallisce l'edizione viene eliminata, così da non
  * lasciare in database date senza evento (e senza link per le notizie).
+ *
+ * Con `TEST_EVENT_REMINDER=1` nel `.env` le notizie della settimana prima e del giorno stesso vengono pubblicate
+ * subito, per provarle senza attendere il cron delle 12:00.
  */
 @autoInjectable()
 export class EventPlanModalSubmitHandler extends InteractionHandler {
@@ -48,6 +59,7 @@ export class EventPlanModalSubmitHandler extends InteractionHandler {
         protected eventTemplateManager?: EventTemplateManager,
         protected eventManager?: EventManager,
         protected settingsManager?: SettingsManager,
+        protected eventNewsManager?: EventNewsManager,
     ) {
         super(context, {
             ...options,
@@ -99,16 +111,43 @@ export class EventPlanModalSubmitHandler extends InteractionHandler {
                 plannedAt: edition.plannedAt,
                 discordEventId: scheduledEvent.id,
             });
-
-            await interaction.editReply(
-                `✅ Evento pianificato per il **${formatZonedDateTime(plannedAt)}**: ${scheduledEvent.url}\n`
-                + 'Le notizie verranno pubblicate alle 12:00 una settimana prima e il giorno stesso.',
-            );
         } catch (error) {
             console.error('[EventPlanModalSubmitHandler] Errore durante la creazione dell\'evento Discord:', error);
             await this.rollback(edition, scheduledEvent);
             await interaction.editReply(`❌ Non è stato possibile creare l'evento su Discord: ${this.describeError(error)}`);
+            return;
         }
+
+        const planned = `✅ Evento pianificato per il **${formatZonedDateTime(plannedAt)}**: ${scheduledEvent.url}\n`;
+
+        if (!EventNewsManager.isTestReminderEnabled()) {
+            await interaction.editReply(`${planned}Le notizie verranno pubblicate alle 12:00 una settimana prima e il giorno stesso.`);
+            return;
+        }
+
+        const testReport = await this.publishTestNews(interaction.client, { ...edition, discordEventId: scheduledEvent.id });
+        await interaction.editReply(`${planned}🧪 \`TEST_EVENT_REMINDER=1\`: ${testReport}`);
+    }
+
+    /**
+     * Modalità di test: pubblica subito entrambe le notizie dell'edizione. Gli errori non annullano la pianificazione,
+     * vengono solo riportati nella risposta.
+     */
+    protected async publishTestNews(client: Client, edition: EventEdition): Promise<string> {
+        const failures: string[] = [];
+
+        for (const kind of EVENT_NEWS_KINDS) {
+            try {
+                await this.eventNewsManager!.publishNews(client, edition, kind);
+            } catch (error) {
+                console.error(`[EventPlanModalSubmitHandler] Errore durante la pubblicazione di test della notizia (${kind}) dell'edizione ${edition.id}:`, error);
+                failures.push(`- **${NEWS_KIND_LABELS[kind]}**: ${this.describeError(error)}`);
+            }
+        }
+
+        return failures.length === 0
+            ? 'notizie della settimana prima e del giorno stesso pubblicate subito.'
+            : ['alcune notizie non sono state pubblicate:', ...failures].join('\n');
     }
 
     /** Crea l'evento programmato nel canale vocale degli eventi, a partire da template ed evento dell'edizione. */

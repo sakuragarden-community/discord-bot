@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosError } from "axios";
+import axios, { AxiosRequestConfig, AxiosError, AxiosResponse } from "axios";
 
 /** Errore di validazione su un singolo campo. */
 export interface ApiViolation {
@@ -76,6 +76,11 @@ export class ApiManager {
 
     /** Esegue la chiamata autenticata e normalizza gli errori delle API. */
     public async request<T>(config: AxiosRequestConfig): Promise<T> {
+        return (await this.requestResponse<T>(config)).data;
+    }
+
+    /** Come {@link request}, ma ritorna l'intera risposta, intestazioni comprese. */
+    public async requestResponse<T>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> {
         const baseUrl = process.env.KODAMA_API_BASE_URL;
 
         if (!baseUrl) {
@@ -94,7 +99,7 @@ export class ApiManager {
                 },
             });
 
-            return response.data;
+            return response;
         } catch (error) {
             throw this.toApiError(error);
         }

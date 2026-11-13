@@ -92,6 +92,8 @@ chmod 600 .env
 
 `KODAMA_API_BASE_URL` non va nel `.env`: è fissata in `docker-compose.prod.yml` a `http://kodama-api:8080`. `dotenv` nel container non trova alcun file `.env` e usa le variabili passate da Compose.
 
+`TEST_EVENT_REMINDER` non va impostata in produzione. Con il valore `1` il bot pubblica le notizie di un evento, sia quella della settimana prima sia quella del giorno stesso, subito dopo averlo pianificato invece che con il cron delle 12:00. Serve solo per i test in sviluppo.
+
 ### Accesso a GHCR
 
 Il login a `ghcr.io` fatto per Kodama API vale anche qui, perché le credenziali stanno in `~deploy/.docker/config.json`. Il PAT con `read:packages` legge il nuovo pacchetto se l'account che lo ha creato ha accesso al repository `discord-bot`. Dopo il primo build, verifica:

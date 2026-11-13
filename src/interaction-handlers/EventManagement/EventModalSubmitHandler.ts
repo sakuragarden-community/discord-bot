@@ -2,9 +2,10 @@ import "reflect-metadata";
 import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
 import { MessageFlags, ModalSubmitInteraction, roleMention } from 'discord.js';
 import { autoInjectable } from 'tsyringe';
-import { EventManager } from '../../managers/EventManager';
+import { EventManager, EventRequest } from '../../managers/EventManager';
 import {
     EVENT_CREATE_MODAL_ID,
+    EVENT_EDIT_MODAL_ID,
     EVENT_INTEREST_INPUT_ID,
     EVENT_IS_OPEN_INPUT_ID,
     EVENT_MAX_PARTICIPANTS_INPUT_ID,
@@ -13,6 +14,7 @@ import {
     formatApiError,
     isAdministrator,
     NO_PERMISSION_MESSAGE,
+    parseRecordId,
     validationError,
 } from '../../utils/EventManagement';
 
@@ -25,9 +27,12 @@ const FIELD_LABELS: Record<string, string> = {
     isOpen: 'Evento aperto',
 };
 
-/** Salva tramite le API l'evento compilato nella modale "Crea Evento". */
+/**
+ * Salva tramite le API l'evento compilato nella modale "Crea Evento" o "Modifica Evento": nel secondo caso il custom
+ * ID riporta l'id dell'evento da aggiornare.
+ */
 @autoInjectable()
-export class EventCreateModalSubmitHandler extends InteractionHandler {
+export class EventModalSubmitHandler extends InteractionHandler {
 
     public constructor(
         context: InteractionHandler.LoaderContext,
@@ -41,10 +46,13 @@ export class EventCreateModalSubmitHandler extends InteractionHandler {
     }
 
     public override parse(interaction: ModalSubmitInteraction) {
-        return interaction.customId === EVENT_CREATE_MODAL_ID ? this.some() : this.none();
+        if (interaction.customId === EVENT_CREATE_MODAL_ID) return this.some<number | null>(null);
+
+        const eventId = parseRecordId(interaction.customId, EVENT_EDIT_MODAL_ID);
+        return eventId === null ? this.none() : this.some<number | null>(eventId);
     }
 
-    public override async run(interaction: ModalSubmitInteraction) {
+    public override async run(interaction: ModalSubmitInteraction, eventId: number | null) {
         if (!isAdministrator(interaction) || !interaction.inCachedGuild()) {
             await interaction.reply({ content: NO_PERMISSION_MESSAGE, flags: MessageFlags.Ephemeral });
             return;
@@ -71,22 +79,30 @@ export class EventCreateModalSubmitHandler extends InteractionHandler {
             return;
         }
 
+        const request: EventRequest = {
+            sectionId: Number(sectionValue),
+            name,
+            interest,
+            maxParticipants,
+            isOpen: isOpenValue === 'yes',
+        };
+
         try {
-            const event = await this.eventManager!.create({
-                sectionId: Number(sectionValue),
-                name,
-                interest,
-                maxParticipants,
-                isOpen: isOpenValue === 'yes',
-            });
+            const event = eventId === null
+                ? await this.eventManager!.create(request)
+                : await this.eventManager!.update(eventId, request);
 
             await interaction.editReply({
-                content: `✅ Evento **${event.name}** creato nella sezione **${event.sectionName}** (interesse: ${roleMention(role.id)}).`,
+                content: `✅ Evento **${event.name}** ${eventId === null ? 'creato' : 'aggiornato'} nella sezione `
+                    + `**${event.sectionName}** (interesse: ${roleMention(role.id)}).`,
                 allowedMentions: { parse: [] },
             });
         } catch (error) {
-            console.error('[EventCreateModalSubmitHandler] Errore durante la creazione dell\'evento:', error);
-            await interaction.editReply(formatApiError(error, FIELD_LABELS, '❌ Non è stato possibile creare l\'evento, riprova più tardi.'));
+            console.error(`[EventModalSubmitHandler] Errore durante il salvataggio dell'evento ${eventId ?? '(nuovo)'}:`, error);
+            const fallback = eventId === null
+                ? '❌ Non è stato possibile creare l\'evento, riprova più tardi.'
+                : '❌ Non è stato possibile aggiornare l\'evento, riprova più tardi.';
+            await interaction.editReply(formatApiError(error, FIELD_LABELS, fallback));
         }
     }
 }

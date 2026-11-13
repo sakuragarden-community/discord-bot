@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
 import { ChannelType, MessageFlags, ModalSubmitInteraction } from 'discord.js';
 import { autoInjectable } from 'tsyringe';
-import { EventTemplateManager } from '../../managers/EventTemplateManager';
+import { EventTemplateManager, EventTemplateRequest } from '../../managers/EventTemplateManager';
 import {
     deleteEventTemplateDraft,
     EVENT_TEMPLATE_DRAFT_EXPIRED_MESSAGE,
@@ -20,6 +20,7 @@ import {
 /** Etichette dei campi di entrambi i passi, usate nei messaggi di validazione delle API. */
 const FIELD_LABELS: Record<string, string> = {
     eventId: 'Evento',
+    name: 'Nome Template',
     discordEventTitle: 'Titolo dell\'Evento Discord',
     discordEventDescription: 'Descrizione dell\'Evento Discord',
     discordEventImage: 'Immagine dell\'Evento Discord',
@@ -28,7 +29,10 @@ const FIELD_LABELS: Record<string, string> = {
     discordThreadPost: 'Messaggio per Thread nel Canale Notizie',
 };
 
-/** Secondo passo della creazione di un template evento: unisce i dati alla bozza e li salva tramite le API. */
+/**
+ * Secondo passo della creazione o modifica di un template evento: unisce i dati alla bozza e li salva tramite le API.
+ * Se la bozza riporta un template esistente, questo viene aggiornato.
+ */
 @autoInjectable()
 export class EventTemplateNewsModalSubmitHandler extends InteractionHandler {
 
@@ -77,23 +81,34 @@ export class EventTemplateNewsModalSubmitHandler extends InteractionHandler {
             return;
         }
 
+        const { existing, ...fields } = draft;
+
         try {
-            const template = await this.eventTemplateManager!.create({
-                ...draft,
+            const request: EventTemplateRequest = {
+                ...fields,
+                // In modifica, senza una nuova immagine si conserva quella attuale
+                discordEventImage: fields.discordEventImage ?? await this.eventTemplateManager!.getImageDataUri(existing!.id),
                 discordNewsChannel: newsChannelId,
                 discordNewsContent: newsContent,
                 discordThreadPost: threadPost || null,
-            });
+            };
+
+            const template = existing
+                ? await this.eventTemplateManager!.update(existing.id, request)
+                : await this.eventTemplateManager!.create(request);
             deleteEventTemplateDraft(interaction.user.id);
 
             await interaction.editReply(
-                `✅ Template **${template.discordEventTitle}** creato per l'evento **${template.eventName}**; `
+                `✅ Template **${template.name}** ${existing ? 'aggiornato' : 'creato'} per l'evento **${template.eventName}**; `
                 + `le notizie verranno pubblicate in ${channel}.`,
             );
         } catch (error) {
             // La bozza resta disponibile: l'utente può correggere i dati premendo di nuovo "Continua"
-            console.error('[EventTemplateNewsModalSubmitHandler] Errore durante la creazione del template:', error);
-            await interaction.editReply(formatApiError(error, FIELD_LABELS, '❌ Non è stato possibile creare il template, riprova più tardi.'));
+            console.error(`[EventTemplateNewsModalSubmitHandler] Errore durante il salvataggio del template ${existing?.id ?? '(nuovo)'}:`, error);
+            const fallback = existing
+                ? '❌ Non è stato possibile aggiornare il template, riprova più tardi.'
+                : '❌ Non è stato possibile creare il template, riprova più tardi.';
+            await interaction.editReply(formatApiError(error, FIELD_LABELS, fallback));
         }
     }
 }

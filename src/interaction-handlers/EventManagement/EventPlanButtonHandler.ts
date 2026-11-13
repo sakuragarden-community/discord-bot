@@ -12,15 +12,14 @@ import {
 import { autoInjectable } from 'tsyringe';
 import { EventTemplate, EventTemplateManager } from '../../managers/EventTemplateManager';
 import {
-    DISCORD_LIMITS,
     EVENT_PLAN_BUTTON_ID,
     EVENT_PLAN_DATE_INPUT_ID,
     EVENT_PLAN_MODAL_ID,
     EVENT_PLAN_TEMPLATE_INPUT_ID,
+    eventTemplateOptions,
     isAdministrator,
     NO_PERMISSION_MESSAGE,
     SELECT_MAX_OPTIONS,
-    truncate,
 } from '../../utils/EventManagement';
 
 /** Apre la modale di pianificazione di un evento, con i template caricati dalle API. Riservato agli amministratori. */
@@ -50,7 +49,7 @@ export class EventPlanButtonHandler extends InteractionHandler {
 
         let templates: EventTemplate[];
         try {
-            templates = await this.eventTemplateManager!.listAll({ sort: 'discordEventTitle,asc' });
+            templates = await this.eventTemplateManager!.listAll({ sort: 'name,asc' });
         } catch (error) {
             console.error('[EventPlanButtonHandler] Errore durante il caricamento dei template:', error);
             await interaction.reply({ content: '❌ Non è stato possibile caricare i template evento, riprova più tardi.', flags: MessageFlags.Ephemeral });
@@ -65,18 +64,14 @@ export class EventPlanButtonHandler extends InteractionHandler {
             console.warn(`[EventPlanButtonHandler] ${templates.length} template presenti, mostrati solo i primi ${SELECT_MAX_OPTIONS}.`);
         }
 
-        await interaction.showModal(this.buildModal(templates.slice(0, SELECT_MAX_OPTIONS)));
+        await interaction.showModal(this.buildModal(templates));
     }
 
     protected buildModal(templates: EventTemplate[]): ModalBuilder {
         const template = new StringSelectMenuBuilder()
             .setCustomId(EVENT_PLAN_TEMPLATE_INPUT_ID)
             .setRequired(true)
-            .addOptions(templates.map(({ id, discordEventTitle, eventName }) => ({
-                value: String(id),
-                label: truncate(discordEventTitle, DISCORD_LIMITS.selectLabel),
-                description: truncate(eventName, DISCORD_LIMITS.selectLabel),
-            })));
+            .addOptions(eventTemplateOptions(templates));
 
         const date = new TextInputBuilder()
             .setCustomId(EVENT_PLAN_DATE_INPUT_ID)

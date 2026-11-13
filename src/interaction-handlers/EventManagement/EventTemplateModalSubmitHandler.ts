@@ -9,28 +9,39 @@ import {
     ModalSubmitInteraction,
 } from 'discord.js';
 import axios from 'axios';
-import { EVENT_TEMPLATE_LIMITS } from '../../managers/EventTemplateManager';
+import { autoInjectable } from 'tsyringe';
+import { EVENT_TEMPLATE_LIMITS, EventTemplate, EventTemplateManager } from '../../managers/EventTemplateManager';
 import {
     EVENT_IMAGE_TYPES,
     EVENT_TEMPLATE_CONTINUE_BUTTON_ID,
     EVENT_TEMPLATE_DESCRIPTION_INPUT_ID,
+    EVENT_TEMPLATE_EDIT_MODAL_ID,
     EVENT_TEMPLATE_EVENT_INPUT_ID,
     EVENT_TEMPLATE_IMAGE_INPUT_ID,
     EVENT_TEMPLATE_MODAL_ID,
+    EVENT_TEMPLATE_NAME_INPUT_ID,
     EVENT_TEMPLATE_TITLE_INPUT_ID,
     isAdministrator,
     NO_PERMISSION_MESSAGE,
+    parseRecordId,
     saveEventTemplateDraft,
     validationError,
 } from '../../utils/EventManagement';
 
 /**
- * Primo passo della creazione di un template evento: scarica l'immagine, conserva i dati in una bozza e propone
- * il pulsante per aprire il secondo passo (una modale non può aprirne un'altra direttamente).
+ * Primo passo della creazione o modifica di un template evento: scarica l'immagine, conserva i dati in una bozza e
+ * propone il pulsante per aprire il secondo passo (una modale non può aprirne un'altra direttamente).
+ *
+ * In modifica il custom ID riporta l'id del template e l'immagine è facoltativa: senza, resta quella attuale.
  */
+@autoInjectable()
 export class EventTemplateModalSubmitHandler extends InteractionHandler {
 
-    public constructor(context: InteractionHandler.LoaderContext, options: InteractionHandler.Options) {
+    public constructor(
+        context: InteractionHandler.LoaderContext,
+        options: InteractionHandler.Options,
+        protected eventTemplateManager?: EventTemplateManager,
+    ) {
         super(context, {
             ...options,
             interactionHandlerType: InteractionHandlerTypes.ModalSubmit,
@@ -38,10 +49,13 @@ export class EventTemplateModalSubmitHandler extends InteractionHandler {
     }
 
     public override parse(interaction: ModalSubmitInteraction) {
-        return interaction.customId === EVENT_TEMPLATE_MODAL_ID ? this.some() : this.none();
+        if (interaction.customId === EVENT_TEMPLATE_MODAL_ID) return this.some<number | null>(null);
+
+        const templateId = parseRecordId(interaction.customId, EVENT_TEMPLATE_EDIT_MODAL_ID);
+        return templateId === null ? this.none() : this.some<number | null>(templateId);
     }
 
-    public override async run(interaction: ModalSubmitInteraction) {
+    public override async run(interaction: ModalSubmitInteraction, templateId: number | null) {
         if (!isAdministrator(interaction)) {
             await interaction.reply({ content: NO_PERMISSION_MESSAGE, flags: MessageFlags.Ephemeral });
             return;
@@ -50,27 +64,45 @@ export class EventTemplateModalSubmitHandler extends InteractionHandler {
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
         const [eventValue] = interaction.fields.getStringSelectValues(EVENT_TEMPLATE_EVENT_INPUT_ID);
+        const name = interaction.fields.getTextInputValue(EVENT_TEMPLATE_NAME_INPUT_ID).trim();
         const title = interaction.fields.getTextInputValue(EVENT_TEMPLATE_TITLE_INPUT_ID).trim();
         const description = interaction.fields.getTextInputValue(EVENT_TEMPLATE_DESCRIPTION_INPUT_ID).trim();
-        const image = interaction.fields.getUploadedFiles(EVENT_TEMPLATE_IMAGE_INPUT_ID, true).first();
+        const image = interaction.fields.getUploadedFiles(EVENT_TEMPLATE_IMAGE_INPUT_ID, false)?.first();
 
-        const imageError = this.validateImage(image);
-        if (imageError) {
-            await interaction.editReply(validationError('Immagine dell\'Evento Discord', imageError));
-            return;
+        // In modifica serve il template attuale, per precompilare il secondo passo
+        let existing: EventTemplate | undefined;
+        if (templateId !== null) {
+            try {
+                existing = await this.eventTemplateManager!.getById(templateId);
+            } catch (error) {
+                console.error(`[EventTemplateModalSubmitHandler] Errore durante il caricamento del template ${templateId}:`, error);
+                await interaction.editReply('❌ Non è stato possibile caricare il template da modificare: potrebbe essere stato cancellato.');
+                return;
+            }
         }
 
-        let dataUri: string;
-        try {
-            dataUri = await this.downloadAsDataUri(image!);
-        } catch (error) {
-            console.error('[EventTemplateModalSubmitHandler] Errore durante il download dell\'immagine:', error);
-            await interaction.editReply('❌ Non è stato possibile leggere l\'immagine caricata, riprova più tardi.');
-            return;
+        // L'immagine è obbligatoria solo in creazione
+        let dataUri: string | undefined;
+        if (image || !existing) {
+            const imageError = this.validateImage(image);
+            if (imageError) {
+                await interaction.editReply(validationError('Immagine dell\'Evento Discord', imageError));
+                return;
+            }
+
+            try {
+                dataUri = await this.downloadAsDataUri(image!);
+            } catch (error) {
+                console.error('[EventTemplateModalSubmitHandler] Errore durante il download dell\'immagine:', error);
+                await interaction.editReply('❌ Non è stato possibile leggere l\'immagine caricata, riprova più tardi.');
+                return;
+            }
         }
 
         saveEventTemplateDraft(interaction.user.id, {
+            existing,
             eventId: Number(eventValue),
+            name,
             discordEventTitle: title,
             discordEventDescription: description,
             discordEventImage: dataUri,
