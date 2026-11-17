@@ -5,23 +5,26 @@ import cron from 'node-cron';
 import { autoInjectable } from 'tsyringe';
 import { EventEdition, EventEditionManager } from '../../managers/EventEditionManager';
 import { EventNewsKind, EventNewsManager } from '../../managers/EventNewsManager';
-import { EVENTS_TIME_ZONE, startOfZonedDay } from '../../utils/EventManagement';
+import {
+    EVENT_NEWS_HOUR,
+    EVENT_NEWS_WEEK_BEFORE_DAYS as WEEK_BEFORE_DAYS,
+    EVENTS_TIME_ZONE,
+    startOfZonedDay,
+} from '../../utils/EventManagement';
 
 /**
  * Ogni giorno alle 12:00 ora italiana. `@sapphire/cron` lavora solo in UTC, mentre `node-cron` accetta il fuso
  * orario e segue il cambio dell'ora legale.
  */
-const PUBLISH_CRON = '0 12 * * *';
-
-/** Giorni di anticipo con cui viene pubblicata la prima notizia. */
-const WEEK_BEFORE_DAYS = 7;
+const PUBLISH_CRON = `0 ${EVENT_NEWS_HOUR} * * *`;
 
 /**
  * Pubblica nel canale notizie di ciascun template la notizia degli eventi che si tengono oggi o fra una settimana,
  * insieme al thread dei commenti (vedi {@link EventNewsManager}).
  *
  * Le notizie partono solo allo scoccare delle 12:00: se il bot non è attivo in quel momento, quelle del giorno
- * non vengono recuperate.
+ * non vengono recuperate. Le edizioni pianificate dopo le 12:00 di 7 giorni prima dell'evento sfuggono al cron per
+ * la notizia della settimana prima: la pubblica subito `EventPlanModalSubmitHandler` alla pianificazione.
  */
 @autoInjectable()
 export class PublishEventNewsListener extends Listener {

@@ -202,6 +202,24 @@ export function startOfZonedDay(date: Date, offsetDays = 0): Date {
     return zonedTimeToUtc(year, month, day + offsetDays, 0, 0);
 }
 
+/** Ora (nel fuso orario degli eventi) in cui il cron giornaliero pubblica le notizie. */
+export const EVENT_NEWS_HOUR = 12;
+
+/** Giorni di anticipo con cui viene pubblicata la notizia della settimana prima. */
+export const EVENT_NEWS_WEEK_BEFORE_DAYS = 7;
+
+/** Istante in cui il cron pubblica la notizia della settimana prima: alle 12:00 di 7 giorni prima dell'evento. */
+export function getWeekBeforeNewsTime(plannedAt: Date): Date {
+    const { year, month, day } = getZonedParts(plannedAt, EVENTS_TIME_ZONE);
+    return zonedTimeToUtc(year, month, day - EVENT_NEWS_WEEK_BEFORE_DAYS, EVENT_NEWS_HOUR, 0);
+}
+
+/** Istante in cui il cron pubblica il promemoria del giorno stesso: alle 12:00 del giorno dell'evento. */
+export function getSameDayNewsTime(plannedAt: Date): Date {
+    const { year, month, day } = getZonedParts(plannedAt, EVENTS_TIME_ZONE);
+    return zonedTimeToUtc(year, month, day, EVENT_NEWS_HOUR, 0);
+}
+
 /**
  * Interpreta una data nel formato `GG/MM/AAAA HH:MM`, nel fuso orario degli eventi.
  * Ritorna `null` se il formato non è rispettato o la data non esiste (es. 31/02).

@@ -23,6 +23,8 @@ import {
     EVENT_PLAN_TEMPLATE_INPUT_ID,
     formatApiError,
     formatZonedDateTime,
+    getSameDayNewsTime,
+    getWeekBeforeNewsTime,
     isAdministrator,
     NO_PERMISSION_MESSAGE,
     parsePlannedAt,
@@ -45,6 +47,10 @@ const FIELD_LABELS: Record<string, string> = {
  * Salva tramite le API l'edizione evento compilata nella modale "Pianifica Evento" e crea il corrispondente
  * evento programmato su Discord. Se la creazione su Discord fallisce l'edizione viene eliminata, così da non
  * lasciare in database date senza evento (e senza link per le notizie).
+ *
+ * Se la pianificazione avviene dopo le 12:00 di 7 giorni prima dell'evento, la notizia della settimana prima viene
+ * pubblicata subito; il promemoria del giorno stesso resta al cron, che però lo salta se le 12:00 del giorno
+ * dell'evento sono già passate.
  *
  * Con `TEST_EVENT_REMINDER=1` nel `.env` le notizie della settimana prima e del giorno stesso vengono pubblicate
  * subito, per provarle senza attendere il cron delle 12:00.
@@ -120,13 +126,42 @@ export class EventPlanModalSubmitHandler extends InteractionHandler {
 
         const planned = `✅ Evento pianificato per il **${formatZonedDateTime(plannedAt)}**: ${scheduledEvent.url}\n`;
 
-        if (!EventNewsManager.isTestReminderEnabled()) {
+        const plannedEdition = { ...edition, discordEventId: scheduledEvent.id };
+
+        if (EventNewsManager.isTestReminderEnabled()) {
+            const testReport = await this.publishTestNews(interaction.client, plannedEdition);
+            await interaction.editReply(`${planned}🧪 \`TEST_EVENT_REMINDER=1\`: ${testReport}`);
+            return;
+        }
+
+        const now = new Date();
+        if (now < getWeekBeforeNewsTime(plannedAt)) {
             await interaction.editReply(`${planned}Le notizie verranno pubblicate alle 12:00 una settimana prima e il giorno stesso.`);
             return;
         }
 
-        const testReport = await this.publishTestNews(interaction.client, { ...edition, discordEventId: scheduledEvent.id });
-        await interaction.editReply(`${planned}🧪 \`TEST_EVENT_REMINDER=1\`: ${testReport}`);
+        const weekBeforeReport = await this.publishWeekBeforeNewsNow(interaction.client, plannedEdition);
+        const sameDayReport = now < getSameDayNewsTime(plannedAt)
+            ? 'Il promemoria verrà pubblicato alle 12:00 del giorno stesso.'
+            : 'Il promemoria del giorno stesso non verrà pubblicato: le 12:00 di oggi sono già passate.';
+        await interaction.editReply(`${planned}${weekBeforeReport}\n${sameDayReport}`);
+    }
+
+    /**
+     * Pianificazione dopo le 12:00 di 7 giorni prima dell'evento: il cron non raggiungerà più l'edizione per la
+     * notizia della settimana prima, che va quindi pubblicata subito. Un errore non annulla la pianificazione,
+     * viene solo riportato nella risposta.
+     */
+    protected async publishWeekBeforeNewsNow(client: Client, edition: EventEdition): Promise<string> {
+        try {
+            const published = await this.eventNewsManager!.publishNews(client, edition, 'week-before');
+            return published
+                ? '📰 Mancano meno di 7 giorni: la notizia della settimana prima è stata pubblicata subito.'
+                : '⚠️ La notizia della settimana prima non è stata pubblicata: l\'evento Discord risulta eliminato.';
+        } catch (error) {
+            console.error(`[EventPlanModalSubmitHandler] Errore durante la pubblicazione immediata della notizia (week-before) dell'edizione ${edition.id}:`, error);
+            return `⚠️ Mancano meno di 7 giorni, ma non è stato possibile pubblicare subito la notizia della settimana prima: ${this.describeError(error)}`;
+        }
     }
 
     /**
