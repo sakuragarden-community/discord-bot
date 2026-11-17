@@ -24,7 +24,12 @@ jobs:
           cache: npm
       - run: npm ci --no-fund
       - name: Audit dipendenze
-        run: npm audit --audit-level=high
+        # Le dipendenze opzionali sono escluse: l'unica è node-gyp (con la sua
+        # catena tinyglobby/picomatch), che sqlite3 usa solo per compilarsi da
+        # sorgente se manca il binario precompilato e che non gira mai a runtime.
+        # Togliere --omit=optional quando esce una versione corretta di picomatch
+        # (GHSA-fc5q-39xc-vjpf).
+        run: npm audit --audit-level=high --omit=optional
       - name: Type check
         run: npx tsc --noEmit
 
