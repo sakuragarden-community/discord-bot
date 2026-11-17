@@ -1,16 +1,20 @@
 import "reflect-metadata";
 import {
+    APIGuildScheduledEventUser,
     ChannelType,
     Client,
+    Guild,
     GuildScheduledEvent,
     hyperlink,
-    NewsChannel,
+    makeURLSearchParams,
     roleMention,
-    TextChannel,
+    Routes,
     ThreadAutoArchiveDuration,
+    ThreadChannel,
+    userMention,
 } from 'discord.js';
 import { autoInjectable } from 'tsyringe';
-import { EventEdition } from './EventEditionManager';
+import { EventEdition, EventEditionManager } from './EventEditionManager';
 import { Event, EventManager } from './EventManager';
 import { EventTemplate, EventTemplateManager } from './EventTemplateManager';
 import {
@@ -25,22 +29,44 @@ import {
 /** Tipo di notizia: la settimana prima riporta il messaggio del template, il giorno stesso un promemoria. */
 export type EventNewsKind = 'week-before' | 'same-day';
 
-/** Titolo H3 con il link alle iscrizioni, in coda alla notizia della settimana prima degli eventi chiusi. */
-function buildSignupHeading(threadUrl: string): string {
-    return `## ${hyperlink(EVENT_SIGNUP_LINK_LABEL, threadUrl)}`;
+/**
+ * Titolo con il link alle iscrizioni, in coda alla notizia della settimana prima degli eventi chiusi. Rimanda al
+ * messaggio di apertura del thread.
+ */
+function buildSignupHeading(signupUrl: string): string {
+    return `## ${hyperlink(EVENT_SIGNUP_LINK_LABEL, signupUrl)}`;
 }
 
-/** Spazio riservato a {@link buildSignupHeading}: a capo, titolo e URL del thread (`/channels/<guild>/<thread>`). */
-const SIGNUP_LINE_MAX_LENGTH = 1 + buildSignupHeading('https://discord.com/channels/00000000000000000000/00000000000000000000').length;
+/**
+ * Spazio riservato a {@link buildSignupHeading}: a capo, titolo e URL del messaggio di apertura del thread
+ * (`/channels/<guild>/<thread>/<message>`).
+ */
+const SIGNUP_LINE_MAX_LENGTH = 1 + buildSignupHeading(
+    'https://discord.com/channels/00000000000000000000/00000000000000000000/00000000000000000000',
+).length;
+
+/** Massimo di utenti per pagina dell'endpoint degli iscritti a un evento e per `allowedMentions.users`. */
+const MAX_USERS_PER_REQUEST = 100;
 
 /** Tipi di notizia nell'ordine in cui vengono pubblicati. */
 export const EVENT_NEWS_KINDS: readonly EventNewsKind[] = ['week-before', 'same-day'];
 
+/** Un messaggio del promemoria, con gli utenti che può pingare. */
+interface ReminderMessage {
+    content: string;
+    users: string[];
+}
+
 /**
- * Pubblica nel canale notizie del template la notizia di un'edizione, chiusa dal tag del ruolo di interesse
- * dell'evento e dal link all'evento Discord. Per gli eventi chiusi, la notizia della settimana prima rimanda anche
- * al thread per le iscrizioni, sia in coda al messaggio sia nella descrizione dell'evento Discord. Il tutto insieme al thread dei commenti (che per gli
- * eventi chiusi raccoglie anche le iscrizioni). Usato dal cron giornaliero e, in test, alla pianificazione.
+ * Pubblica le notizie di un'edizione. Usato dal cron giornaliero e alla pianificazione (subito, se mancano meno di
+ * 7 giorni, o in modalità di test).
+ *
+ * - **Settimana prima**: nel canale notizie del template, chiusa dal tag del ruolo di interesse dell'evento e dal
+ *   link all'evento Discord, insieme al thread dei commenti (che per gli eventi chiusi raccoglie anche le
+ *   iscrizioni, linkato in coda alla notizia e nella descrizione dell'evento Discord). L'ID del thread viene salvato
+ *   nell'edizione.
+ * - **Giorno stesso**: un promemoria nel thread della notizia della settimana prima, che pinga chi ha cliccato
+ *   "Mi interessa" sull'evento Discord.
  */
 @autoInjectable()
 export class EventNewsManager {
@@ -48,6 +74,7 @@ export class EventNewsManager {
     public constructor(
         protected eventTemplateManager?: EventTemplateManager,
         protected eventManager?: EventManager,
+        protected eventEditionManager?: EventEditionManager,
     ) {}
 
     /**
@@ -61,6 +88,13 @@ export class EventNewsManager {
     /** Ritorna `false` se l'evento Discord dell'edizione è stato eliminato e la notizia non è stata pubblicata. */
     public async publishNews(client: Client, edition: EventEdition, kind: EventNewsKind): Promise<boolean> {
         const template = await this.eventTemplateManager!.getById(edition.eventTemplateId);
+
+        return kind === 'week-before'
+            ? this.publishWeekBeforeNews(client, edition, template)
+            : this.publishSameDayReminder(client, edition, template);
+    }
+
+    protected async publishWeekBeforeNews(client: Client, edition: EventEdition, template: EventTemplate): Promise<boolean> {
         const event = await this.eventManager!.getById(template.eventId);
 
         const channel = await client.channels.fetch(template.discordNewsChannel).catch(() => null);
@@ -68,19 +102,16 @@ export class EventNewsManager {
             throw new Error(`il canale notizie ${template.discordNewsChannel} del template ${template.id} non esiste o non è testuale`);
         }
 
-        const scheduledEvent = await this.resolveScheduledEvent(channel, edition);
+        const scheduledEvent = await this.resolveScheduledEvent(channel.guild, edition);
         if (scheduledEvent === undefined) {
-            console.warn(`[EventNewsManager] Evento Discord dell'edizione ${edition.id} eliminato: notizia (${kind}) non pubblicata.`);
+            console.warn(`[EventNewsManager] Evento Discord dell'edizione ${edition.id} eliminato: notizia (week-before) non pubblicata.`);
             return false;
         }
 
-        // Per gli eventi chiusi la notizia della settimana prima apre le iscrizioni nel thread
-        const opensSignup = kind === 'week-before' && !event.isOpen;
-
+        // Per gli eventi chiusi la notizia apre le iscrizioni nel thread
+        const opensSignup = !event.isOpen;
         const plannedAt = new Date(edition.plannedAt);
-        const content = kind === 'week-before'
-            ? this.fillNewsVariables(template.discordNewsContent, event, plannedAt)
-            : this.buildReminder(template, plannedAt);
+        const content = this.fillNewsVariables(template.discordNewsContent, event, plannedAt);
 
         // Riga finale: tag del ruolo di interesse e link all'evento. Si tronca solo il contenuto, per non perderla;
         // va lasciato spazio anche al link alle iscrizioni, aggiunto quando il thread esiste
@@ -90,30 +121,132 @@ export class EventNewsManager {
         const message = await channel.send({ content: text, allowedMentions: { roles: [event.interest] } });
 
         const thread = await message.startThread({
-            name: truncate(`💬 ${template.discordEventTitle}`, DISCORD_LIMITS.threadName),
+            name: this.buildThreadName(template, plannedAt),
             autoArchiveDuration: ThreadAutoArchiveDuration.OneWeek,
             reason: `Commenti all'evento "${template.discordEventTitle}"`,
         });
-        await thread.send(template.discordThreadPost ?? this.buildDefaultThreadPost(template));
+        const threadPost = template.discordThreadPost
+            ? this.fillNewsVariables(template.discordThreadPost, event, plannedAt)
+            : this.buildDefaultThreadPost(template);
+        const firstPost = await thread.send(truncate(threadPost, DISCORD_LIMITS.message));
+        await this.saveNewsThread(edition, thread);
 
+        // Le iscrizioni rimandano al messaggio di apertura del thread, non al thread in sé
         if (opensSignup) {
-            await message.edit({ content: `${text}\n${buildSignupHeading(thread.url)}`, allowedMentions: { parse: [] } });
-            if (scheduledEvent) await this.addSignupLinkToEvent(scheduledEvent, thread.url);
+            await message.edit({ content: `${text}\n${buildSignupHeading(firstPost.url)}`, allowedMentions: { parse: [] } });
+            if (scheduledEvent) await this.addSignupLinkToEvent(scheduledEvent, firstPost.url);
         }
 
-        console.info(`[EventNewsManager] Pubblicata la notizia (${kind}) dell'edizione ${edition.id} in #${channel.name}.`);
+        console.info(`[EventNewsManager] Pubblicata la notizia (week-before) dell'edizione ${edition.id} in #${channel.name}.`);
         return true;
     }
 
     /**
-     * Inserisce dopo la prima riga della descrizione dell'evento Discord (il riepilogo) il link alle iscrizioni nel
-     * thread. Un link già presente viene sostituito, così una seconda pubblicazione non lo duplica. Un errore non
+     * Promemoria nel thread della notizia della settimana prima. L'edizione viene riletta dalle API, perché il
+     * thread potrebbe essere stato salvato dopo che è stata caricata (es. modalità di test).
+     */
+    protected async publishSameDayReminder(client: Client, edition: EventEdition, template: EventTemplate): Promise<boolean> {
+        const { discordNewsThreadId } = await this.eventEditionManager!.getById(edition.id);
+        if (!discordNewsThreadId) {
+            throw new Error(`l'edizione ${edition.id} non ha un thread della notizia della settimana prima in cui pubblicare il promemoria`);
+        }
+
+        const thread = await client.channels.fetch(discordNewsThreadId).catch(() => null);
+        if (!thread?.isThread()) {
+            throw new Error(`il thread ${discordNewsThreadId} della notizia dell'edizione ${edition.id} non esiste più`);
+        }
+
+        const scheduledEvent = await this.resolveScheduledEvent(thread.guild, edition);
+        if (scheduledEvent === undefined) {
+            console.warn(`[EventNewsManager] Evento Discord dell'edizione ${edition.id} eliminato: promemoria (same-day) non pubblicato.`);
+            return false;
+        }
+
+        // Il thread si archivia dopo una settimana di inattività, cioè proprio intorno al giorno dell'evento
+        if (thread.archived) await thread.setArchived(false, 'Promemoria del giorno dell\'evento');
+
+        const interested = scheduledEvent ? await this.fetchInterestedUserIds(client, scheduledEvent) : [];
+        const reminder = [this.buildReminder(template, new Date(edition.plannedAt)), scheduledEvent?.url]
+            .filter(Boolean)
+            .join('\n');
+
+        for (const { content, users } of this.buildReminderMessages(reminder, interested)) {
+            await thread.send({ content, allowedMentions: { users } });
+        }
+
+        console.info(`[EventNewsManager] Pubblicato il promemoria (same-day) dell'edizione ${edition.id} nel thread ${thread.id}, con ${interested.length} menzioni.`);
+        return true;
+    }
+
+    /**
+     * Salva nell'edizione il thread della notizia, dove il giorno dell'evento uscirà il promemoria. Un errore non
      * blocca la notizia, già pubblicata: viene solo registrato.
      */
-    protected async addSignupLinkToEvent(scheduledEvent: GuildScheduledEvent, threadUrl: string): Promise<void> {
+    protected async saveNewsThread(edition: EventEdition, thread: ThreadChannel): Promise<void> {
+        try {
+            await this.eventEditionManager!.update(edition.id, {
+                eventTemplateId: edition.eventTemplateId,
+                plannedAt: edition.plannedAt,
+                discordEventId: edition.discordEventId,
+                discordNewsThreadId: thread.id,
+            });
+        } catch (error) {
+            console.error(`[EventNewsManager] Errore durante il salvataggio del thread ${thread.id} nell'edizione ${edition.id}: il promemoria del giorno stesso non potrà essere pubblicato.`, error);
+        }
+    }
+
+    /**
+     * Utenti (bot esclusi) che hanno cliccato "Mi interessa" sull'evento Discord. `fetchSubscribers` di discord.js
+     * non espone la paginazione, quindi l'endpoint viene chiamato direttamente, 100 utenti alla volta.
+     */
+    protected async fetchInterestedUserIds(client: Client, scheduledEvent: GuildScheduledEvent): Promise<string[]> {
+        const ids: string[] = [];
+        let after: string | undefined;
+
+        while (true) {
+            const page = await client.rest.get(Routes.guildScheduledEventUsers(scheduledEvent.guildId, scheduledEvent.id), {
+                query: makeURLSearchParams({ limit: MAX_USERS_PER_REQUEST, after }),
+            }) as APIGuildScheduledEventUser[];
+
+            ids.push(...page.filter(({ user }) => !user.bot).map(({ user }) => user.id));
+            if (page.length < MAX_USERS_PER_REQUEST) return ids;
+            after = page[page.length - 1].user.id;
+        }
+    }
+
+    /**
+     * Divide promemoria e menzioni in messaggi entro i limiti di Discord (lunghezza e 100 utenti pingabili per
+     * messaggio): il primo contiene il promemoria, i successivi solo le menzioni rimaste.
+     */
+    protected buildReminderMessages(reminder: string, userIds: string[]): ReminderMessage[] {
+        const messages: ReminderMessage[] = [{ content: truncate(reminder, DISCORD_LIMITS.message), users: [] }];
+
+        for (const id of userIds) {
+            const current = messages[messages.length - 1];
+            const mention = userMention(id);
+            const separator = current.users.length > 0 ? ' ' : current.content ? '\n\n' : '';
+
+            if (current.users.length < MAX_USERS_PER_REQUEST
+                && current.content.length + separator.length + mention.length <= DISCORD_LIMITS.message) {
+                current.content += separator + mention;
+                current.users.push(id);
+            } else {
+                messages.push({ content: mention, users: [id] });
+            }
+        }
+
+        return messages;
+    }
+
+    /**
+     * Inserisce dopo la prima riga della descrizione dell'evento Discord (il riepilogo) il link alle iscrizioni, cioè
+     * al messaggio di apertura del thread. Un link già presente viene sostituito, così una seconda pubblicazione non lo duplica. Un errore non
+     * blocca la notizia, già pubblicata: viene solo registrato.
+     */
+    protected async addSignupLinkToEvent(scheduledEvent: GuildScheduledEvent, signupUrl: string): Promise<void> {
         const [summary, ...rest] = (scheduledEvent.description ?? '').split('\n');
         const body = rest[0]?.includes(EVENT_SIGNUP_LINK_LABEL) ? rest.slice(1) : rest;
-        const signupLine = hyperlink(EVENT_SIGNUP_LINK_LABEL, threadUrl);
+        const signupLine = hyperlink(EVENT_SIGNUP_LINK_LABEL, signupUrl);
 
         try {
             await scheduledEvent.edit({
@@ -129,14 +262,14 @@ export class EventNewsManager {
      * Evento Discord dell'edizione: `null` se l'edizione non ne ha uno (la notizia esce senza link),
      * `undefined` se l'evento è stato eliminato da Discord, cioè annullato.
      */
-    protected async resolveScheduledEvent(channel: TextChannel | NewsChannel, edition: EventEdition): Promise<GuildScheduledEvent | null | undefined> {
+    protected async resolveScheduledEvent(guild: Guild, edition: EventEdition): Promise<GuildScheduledEvent | null | undefined> {
         if (!edition.discordEventId) {
             console.warn(`[EventNewsManager] L'edizione ${edition.id} non ha un evento Discord: notizia senza link.`);
             return null;
         }
 
         try {
-            return await channel.guild.scheduledEvents.fetch(edition.discordEventId);
+            return await guild.scheduledEvents.fetch(edition.discordEventId);
         } catch (error) {
             // Unknown Guild Scheduled Event
             if ((error as { code?: number }).code === 10070) return undefined;
@@ -145,7 +278,18 @@ export class EventNewsManager {
     }
 
     /**
-     * Variabili disponibili nel messaggio della notizia:
+     * Titolo del thread: titolo dell'evento e data, es. `💬 Arte libera | sabato 28 novembre`. Se supera il limite di
+     * Discord si accorcia il titolo, così la data resta sempre visibile.
+     */
+    protected buildThreadName(template: EventTemplate, plannedAt: Date): string {
+        const prefix = '💬 ';
+        const suffix = ` | ${formatZonedLongDate(plannedAt)}`;
+        const title = truncate(template.discordEventTitle, DISCORD_LIMITS.threadName - prefix.length - suffix.length);
+        return `${prefix}${title}${suffix}`;
+    }
+
+    /**
+     * Variabili disponibili nel messaggio della notizia e nel messaggio di apertura del thread:
      * - `{{data}}`: giorno dell'edizione, es. `sabato 21 novembre`;
      * - `{{ora}}`: ora italiana dell'edizione, es. `21:15`;
      * - `{{partecipanti}}`: numero massimo di partecipanti dell'evento, anche se `0`.

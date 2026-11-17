@@ -11,6 +11,8 @@ export interface EventEdition {
     plannedAt: string;
     /** Evento programmato creato su Discord, `null` finché non esiste. */
     discordEventId: string | null;
+    /** Thread della notizia della settimana prima, dove esce il promemoria; `null` finché non esiste. */
+    discordNewsThreadId: string | null;
 }
 
 /** Payload di creazione e aggiornamento (semantica `PUT`: i campi omessi vengono azzerati). */
@@ -18,6 +20,7 @@ export interface EventEditionRequest {
     eventTemplateId: number;
     plannedAt: string;
     discordEventId?: string | null;
+    discordNewsThreadId?: string | null;
 }
 
 /** Parametri della lista: `from`/`to` filtrano `plannedAt` nell'intervallo `[from, to)`. */

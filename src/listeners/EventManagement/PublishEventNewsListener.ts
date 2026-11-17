@@ -19,8 +19,9 @@ import {
 const PUBLISH_CRON = `0 ${EVENT_NEWS_HOUR} * * *`;
 
 /**
- * Pubblica nel canale notizie di ciascun template la notizia degli eventi che si tengono oggi o fra una settimana,
- * insieme al thread dei commenti (vedi {@link EventNewsManager}).
+ * Pubblica la notizia degli eventi che si tengono fra una settimana (nel canale notizie del template, con il thread
+ * dei commenti) e il promemoria di quelli che si tengono oggi (nel thread, pingando chi ha cliccato "Mi interessa"):
+ * vedi {@link EventNewsManager}.
  *
  * Le notizie partono solo allo scoccare delle 12:00: se il bot non è attivo in quel momento, quelle del giorno
  * non vengono recuperate. Le edizioni pianificate dopo le 12:00 di 7 giorni prima dell'evento sfuggono al cron per

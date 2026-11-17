@@ -30,8 +30,11 @@ export function buildMemberNotificationEmbed(options: MemberNotificationOptions)
     if (member?.leftAt) {
         fields.push({ name: '📤 Uscita', value: formatDate(member.leftAt), inline: true });
     }
+    // La presentazione viene riportata solo se il membro l'ha scritta
+    if (member?.presentation?.trim()) {
+        fields.push({ name: '🗣 Presentazione', value: member.presentation });
+    }
     fields.push(
-        { name: '🗣 Presentazione', value: member?.presentation ?? 'Non presente' },
         // Il footer non supporta i link: ID e collegamento al profilo stanno in un campo dedicato
         { name: '🆔 Discord ID', value: `${user.id} • ${hyperlink('Link', `https://discord.com/users/${user.id}`)}` },
     );

@@ -116,6 +116,7 @@ export class EventPlanModalSubmitHandler extends InteractionHandler {
                 eventTemplateId: edition.eventTemplateId,
                 plannedAt: edition.plannedAt,
                 discordEventId: scheduledEvent.id,
+                discordNewsThreadId: edition.discordNewsThreadId,
             });
         } catch (error) {
             console.error('[EventPlanModalSubmitHandler] Errore durante la creazione dell\'evento Discord:', error);

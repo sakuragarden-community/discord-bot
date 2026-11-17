@@ -75,7 +75,7 @@ export const DISCORD_LIMITS = {
 } as const;
 
 /** Testo del link al thread delle iscrizioni, per gli eventi chiusi (notizia ed evento Discord). */
-export const EVENT_SIGNUP_LINK_LABEL = 'PREMI QUI PER ISCRIVERTI ALL\'EVENTO!';
+export const EVENT_SIGNUP_LINK_LABEL = 'VUOI ISCRIVERTI ALL\'EVENTO? CLICCA QUI!';
 
 /** Formati di immagine accettati da Discord come copertina di un evento. */
 export const EVENT_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'] as const;

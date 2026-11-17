@@ -233,7 +233,7 @@ export function buildEventTemplateNewsModal(template?: EventTemplate): ModalBuil
                 .setTextInputComponent(content),
             new LabelBuilder()
                 .setLabel('Messaggio per Thread nel Canale Notizie')
-                .setDescription('Markdown, opzionale: se vuoto il thread si apre con un invito a commentare')
+                .setDescription('Opzionale, se vuoto invita a commentare. Variabili: {{data}}, {{ora}}, {{partecipanti}}')
                 .setTextInputComponent(threadPost),
         );
 }
