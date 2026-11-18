@@ -1,2 +1,3 @@
-In questo canale trovi **i thread e le funzioni dedicate alla gestione degli eventi** di Sakura Garden.
-Ogni categoria di eventi ha il proprio thread, raggiungibile dal menu qui sotto.
+Thread e strumenti per la gestione degli eventi di Sakura Garden. I pulsanti sono **riservati agli amministratori**.
+📆 **Nella settimana prima del nuovo mese** pianifica le date delle tue serate.
+📖 Come funziona tutto il resto? Leggi la documentazione qui sotto.

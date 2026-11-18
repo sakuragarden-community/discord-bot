@@ -469,23 +469,23 @@
         "embedTitle": "🎉 Gestione degli eventi",
         "content": "staff/eventsmanagement.md",
         "image": "",
-        "buttons": []
-      },
-      {
-        "type": "embed",
-        "embedColor": "alert",
-        "embedTitle": "📆 Come funziona la pianificazione degli eventi",
-        "content": "staff/eventsplanning.md",
-        "image": "",
-        "buttons": []
-      },
-      {
-        "type": "embed",
-        "embedColor": "secondary",
-        "embedTitle": "🛠️ Strumenti di gestione",
-        "content": "staff/eventstools.md",
-        "image": "",
-        "buttons": []
+        "buttons": [
+          {
+            "type": "link",
+            "label": "📆 Pianificazione mensile",
+            "url": "https://outline.sakuragarden.it/doc/pianificazione-mensile-degli-eventi-vA6k9ySeW3"
+          },
+          {
+            "type": "link",
+            "label": "🛠️ Eventi e template",
+            "url": "https://outline.sakuragarden.it/doc/gestire-eventi-e-template-zluBkIdZxQ"
+          },
+          {
+            "type": "link",
+            "label": "📰 Pianificazione e notizie",
+            "url": "https://outline.sakuragarden.it/doc/pianificare-un-evento-notizie-e-promemoria-RbruE8ouqo"
+          }
+        ]
       },
       {
         "type": "default",
@@ -565,17 +565,17 @@
         "buttons": [
           {
             "type": "link",
-            "label": "\uD83E\uDEC2 Social",
+            "label": "🫂 Social",
             "url": "https://discord.com/channels/1302653623360294942/1567498838762061884"
           },
           {
             "type": "link",
-            "label": "\uD83C\uDFA8 Arte",
+            "label": "🎨 Arte",
             "url": "https://discord.com/channels/1302653623360294942/1567498891233075361"
           },
           {
             "type": "link",
-            "label": "\uD83D\uDD2B Overwatch",
+            "label": "🔫 Overwatch",
             "url": "https://discord.com/channels/1302653623360294942/1567499063979409468"
           }
         ]
