@@ -466,8 +466,16 @@
       {
         "type": "embed",
         "embedColor": "primary",
-        "embedTitle": "🎉 Gestione degli eventi",
+        "embedTitle": "📖 Documentazione",
         "content": "staff/eventsmanagement.md",
+        "image": "",
+        "buttons": []
+      },
+      {
+        "type": "default",
+        "embedColor": "",
+        "embedTitle": "",
+        "content": "",
         "image": "",
         "buttons": [
           {
@@ -486,6 +494,14 @@
             "url": "https://outline.sakuragarden.it/doc/pianificare-un-evento-notizie-e-promemoria-RbruE8ouqo"
           }
         ]
+      },
+      {
+        "type": "embed",
+        "embedColor": "alert",
+        "embedTitle": "🛠️ Strumenti di gestione eventi",
+        "content": "staff/eventsactions.md",
+        "image": "",
+        "buttons": []
       },
       {
         "type": "default",
